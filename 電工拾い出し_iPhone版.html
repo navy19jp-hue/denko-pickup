@@ -1,0 +1,94 @@
+<!doctype html><html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>電工拾い出し 社内版</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f4f6;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+header{background:#0f172a;color:white;padding:15px 16px;position:sticky;top:0;z-index:5}h1{margin:0;font-size:20px}.sub{font-size:12px;opacity:.7}
+main{max-width:1050px;margin:auto;padding:14px 14px 100px}.card{background:white;border:1px solid #e5e7eb;border-radius:16px;padding:14px;margin-bottom:12px}
+input,select{padding:11px;border:1px solid #d1d5db;border-radius:10px;font-size:15px;width:100%}.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit}.primary,.secondary,.danger{padding:10px 12px;border-radius:11px;font-weight:700}.primary{background:#0f172a;color:white;border:0}.secondary{background:white;border:1px solid #d1d5db}.danger{background:#fee2e2;color:#991b1b;border:0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}@media(min-width:760px){.grid{grid-template-columns:repeat(4,1fr)}}
+.item{border:1px solid #e5e7eb;border-radius:13px;padding:10px}.name{font-weight:800;font-size:13px}.muted{font-size:11px;color:#6b7280}.small{font-size:12px}.qtyrow{display:flex;align-items:center;gap:6px;margin-top:8px}.q{width:38px;height:38px;border:0;border-radius:9px;background:#e5e7eb;font-size:20px}.qty{flex:1;text-align:center;font-weight:900}
+.tabs{display:flex;gap:7px;overflow:auto}.tab{white-space:nowrap;border:1px solid #d1d5db;border-radius:999px;padding:8px 12px;background:white}.tab.on{background:#0f172a;color:white}
+.badge{display:inline-block;background:#ecfdf5;color:#047857;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800}
+.list{display:grid;grid-template-columns:1fr 60px 100px 100px;gap:7px;padding:8px 0;border-bottom:1px solid #eee;align-items:center}.notice{background:#f8fafc;border-radius:10px;padding:9px;font-size:12px;color:#475569}
+.plan{position:relative;border:1px solid #d1d5db;border-radius:12px;overflow:hidden}.plan canvas{display:block;width:100%;height:auto}.pin{position:absolute;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:#0f172a;color:white;border:2px solid white;font-size:11px}
+footer{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #ddd;padding:9px 14px;z-index:10}.foot{max-width:1050px;margin:auto;display:flex;gap:8px}.foot button{flex:1}
+.total{font-size:27px;font-weight:900}
+</style></head><body>
+<header><h1>電工拾い出し 社内版</h1><div class="sub">社内LAN共有・案件保存・図面拾い・関連部材・定価集計</div></header>
+<main>
+<section class="card"><b>案件</b><div class="toolbar" style="margin-top:9px"><input id="project" placeholder="工事名" style="flex:1"><input id="site" placeholder="現場名" style="flex:1"><button class="primary" onclick="newProject()">新規</button></div></section>
+<section class="card"><b>部屋・エリア</b><div class="toolbar" style="margin:9px 0"><input id="roomName" placeholder="例：1F事務室" style="flex:1"><button class="primary" onclick="addRoom()">追加</button></div><div id="rooms" class="tabs"></div></section>
+<section class="card"><div style="display:flex;justify-content:space-between"><b>器具拾い出し</b><span class="badge" id="count">0</span></div>
+<div class="toolbar" style="margin:9px 0"><select id="maker" onchange="filterSeries()" style="flex:1"></select><select id="series" onchange="renderProducts()" style="flex:1"></select><input id="search" oninput="renderProducts()" placeholder="品番・器具名" style="flex:1.3"></div>
+<div id="products" class="grid"></div></section>
+<section class="card"><b>図面拾い</b><div class="notice" style="margin:8px 0">図面を読み込み、器具を選択して図面をタップすると数量も増えます。</div>
+<div class="toolbar"><input id="file" type="file" accept="image/*" style="flex:1"><select id="pinModel" style="flex:1"></select></div>
+<div class="plan" id="plan"><canvas id="canvas" width="900" height="560"></canvas></div></section>
+<section class="card"><b>関連部材 自動展開</b><div class="notice" style="margin:8px 0">登録された関連部材ルールに従って自動計上します。</div><div id="parts"></div></section>
+<section class="card"><b>材料定価集計</b><div id="estimate"></div><hr><div style="display:flex;justify-content:space-between"><span>税抜</span><b id="subTotal">¥0</b></div><div style="display:flex;justify-content:space-between"><span>消費税10%</span><b id="tax">¥0</b></div><div style="display:flex;justify-content:space-between"><span>税込</span><b class="total" id="total">¥0</b></div></section>
+<section class="card"><b>社内共有</b><div class="notice" style="margin:8px 0">保存すると社内サーバーの共有データに保存され、同じ社内URLを開いた端末から読込できます。</div>
+<div class="toolbar"><button class="primary" onclick="save()">社内保存</button><button class="secondary" onclick="load()">社内読込</button><button class="secondary" onclick="csv()">CSV</button></div></section>
+</main><footer><div class="foot"><button class="primary" onclick="save()">社内保存</button><button class="primary" onclick="csv()">CSV出力</button></div></footer>
+<script>
+const P=[
+["Panasonic","コスモシリーズ ワイド21","片切スイッチ","WT5001",280],
+["Panasonic","コスモシリーズ ワイド21","3路スイッチ","WT5002",450],
+["Panasonic","コスモシリーズ ワイド21","4路スイッチ","WT50049",1440],
+["Panasonic","コスモシリーズ ワイド21","ほたる片切スイッチ","WT50519",610],
+["Panasonic","コスモシリーズ ワイド21","ほたる3路スイッチ","WT50529",775],
+["Panasonic","コスモシリーズ ワイド21","ほたる4路スイッチ","WT50549",1770],
+["Panasonic","コスモシリーズ ワイド21","ダブルコンセント","WTF1502WK",420],
+["Panasonic","コスモシリーズ ワイド21","接地ダブルコンセント","WTF13123WK",650],
+["Panasonic","コスモシリーズ ワイド21","1連用プレート","WT8101W",0],
+["Panasonic","コスモシリーズ ワイド21","スイッチ取付枠","WT9201W",0],
+["東芝ライテック","WIDE-i","スイッチ","未登録",0],
+["東芝ライテック","WIDE-i","コンセント","未登録",0],
+["東芝ライテック","WIDE-i","プレート","未登録",0],
+["JIMBO","NKシリーズ","スイッチ","未登録",0],
+["JIMBO","NKシリーズ","コンセント","未登録",0],
+["JIMBO","NKシリーズ","プレート","未登録",0],
+["神保電器","artific series","スイッチ","未登録",0],
+["神保電器","artific series","コンセント","未登録",0],
+["神保電器","J・WIDE SLIM","スイッチ","未登録",0],
+["神保電器","J・WIDE SLIM","コンセント","未登録",0],
+["明工社","MLカラー配線器具","スイッチ","未登録",0],
+["明工社","MLカラー配線器具","コンセント","未登録",0],
+["明工社","医療施設用配線器具","コンセント","未登録",0],
+["アメリカン電機","NEMA","コンセント","未登録",0],
+["アメリカン電機","NEMA","プラグ","未登録",0]
+].map(x=>({maker:x[0],series:x[1],name:x[2],model:x[3],price:x[4]}));
+const rules={"WT5001":[["WT9201W",1],["WT8101W",1]],"WT5002":[["WT9201W",1],["WT8101W",1]],"WT50049":[["WT9201W",1],["WT8101W",1]],"WT50519":[["WT9201W",1],["WT8101W",1]],"WT50529":[["WT9201W",1],["WT8101W",1]],"WT50549":[["WT9201W",1],["WT8101W",1]],"WTF1502WK":[["WT9201W",1],["WT8101W",1]],"WTF13123WK":[["WT9201W",1],["WT8101W",1]]};
+let rooms=[],cur=-1,img=null;
+const yen=n=>"¥"+Number(n).toLocaleString("ja-JP"), product=m=>P.find(x=>x.model===m);
+function sync(){let ms=[...new Set(P.map(x=>x.maker))];maker.innerHTML=ms.map(x=>`<option>${x}</option>`).join("");filterSeries()}
+function filterSeries(){let ss=[...new Set(P.filter(x=>x.maker===maker.value).map(x=>x.series))];series.innerHTML='<option value="ALL">全シリーズ</option>'+ss.map(x=>`<option>${x}</option>`).join("");renderProducts()}
+function renderProducts(){let q=search.value.toLowerCase(),list=P.filter(x=>x.maker===maker.value&&(series.value==="ALL"||x.series===series.value)&&(`${x.name}${x.model}${x.series}`).toLowerCase().includes(q));products.innerHTML="";pinModel.innerHTML=list.map(x=>`<option value="${x.model}">${x.name} / ${x.model}</option>`).join("");list.forEach(x=>{let d=document.createElement("div");d.className="item";d.innerHTML=`<div class="name">${x.name}</div><div class="muted">${x.series}</div><div class="small">${x.model}</div><b>${x.price?yen(x.price):"定価未登録"}</b><div class="qtyrow"><button class="q" onclick="pick('${x.model}',-1)">−</button><div class="qty">${rooms[cur]?.items[x.model]||0}</div><button class="q" onclick="pick('${x.model}',1)">＋</button></div>`;products.appendChild(d)})}
+function addRoom(){let n=roomName.value.trim();if(!n)return;rooms.push({name:n,items:{},pins:[]});cur=rooms.length-1;roomName.value="";render()}
+function pick(m,d){if(cur<0){alert("先に部屋を追加してください");return}rooms[cur].items[m]=(rooms[cur].items[m]||0)+d;if(rooms[cur].items[m]<0)rooms[cur].items[m]=0;render()}
+function renderRooms(){roomsEl.innerHTML="";rooms.forEach((r,i)=>{let b=document.createElement("button");b.className="tab"+(i===cur?" on":"");b.textContent=r.name;b.onclick=()=>{cur=i;render()};roomsEl.appendChild(b)});count.textContent=rooms[cur]?Object.values(rooms[cur].items).reduce((a,b)=>a+b,0):0}
+function expanded(){let s={};rooms.forEach(r=>Object.entries(r.items).forEach(([m,q])=>{s[m]=(s[m]||0)+q;(rules[m]||[]).forEach(([a,n])=>s[a]=(s[a]||0)+q*n)}));return s}
+function renderEstimate(){let s=expanded(),h="",tot=0;Object.entries(s).forEach(([m,q])=>{let p=product(m),c=q*(p?.price||0);tot+=c;h+=`<div class="list"><span>${p?.name||m}<br><small class="muted">${p?.maker||""} ${p?.series||""} / ${m}</small></span><b>${q}</b><span>${p?.price?yen(p.price):"未登録"}</span><b>${p?.price?yen(c):"—"}</b></div>`});estimate.innerHTML=h||'<div class="muted">まだありません</div>';subTotal.textContent=yen(tot);let t=Math.round(tot*.1);tax.textContent=yen(t);total.textContent=yen(tot+t)}
+function renderParts(){let s={};rooms.forEach(r=>Object.entries(r.items).forEach(([m,q])=>(rules[m]||[]).forEach(([a,n])=>s[a]=(s[a]||0)+q*n)));let h="";Object.entries(s).forEach(([m,q])=>{let p=product(m);h+=`<div class="list"><span>${p?.name||"関連部材"}<br><small class="muted">${m}</small></span><b>${q}</b><span>${p?.price?yen(p.price):"未登録"}</span><b>${p?.price?yen(p.price*q):"—"}</b></div>`});parts.innerHTML=h||'<div class="muted">関連部材はありません</div>'}
+const cv=document.getElementById("canvas"),cx=cv.getContext("2d");function draw(){cx.clearRect(0,0,900,560);if(img){let s=Math.min(900/img.width,560/img.height),w=img.width*s,h=img.height*s;cx.drawImage(img,(900-w)/2,(560-h)/2,w,h)}else{cx.fillStyle="#f8fafc";cx.fillRect(0,0,900,560);cx.fillStyle="#94a3b8";cx.font="20px sans-serif";cx.textAlign="center";cx.fillText("図面画像を選択してください",450,280)}}file.onchange=e=>{let f=e.target.files[0];if(!f)return;let im=new Image();im.onload=()=>{img=im;draw()};im.src=URL.createObjectURL(f)}
+cv.onclick=e=>{if(cur<0){alert("部屋を追加してください");return}let r=cv.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*900,y=(e.clientY-r.top)/r.height*560,m=pinModel.value;if(!m)return;rooms[cur].pins.push({x,y,model:m});pick(m,1)}
+function renderPins(){draw();document.querySelectorAll(".pin").forEach(x=>x.remove());if(cur<0)return;rooms[cur].pins.forEach((p,i)=>{let b=document.createElement("button");b.className="pin";b.textContent="＋";b.style.left=p.x/900*100+"%";b.style.top=p.y/560*100+"%";b.onclick=e=>{e.stopPropagation();if(confirm("このピンを削除しますか？")){rooms[cur].pins.splice(i,1);pick(p.model,-1)}};plan.appendChild(b)})}
+async function save(){
+ localStorage.setItem("denkoPickup_iPhone",JSON.stringify({
+   project:project.value,site:site.value,rooms
+ }));
+ alert("このiPhoneに案件を保存しました");
+}
+async function load(){
+ let d=JSON.parse(localStorage.getItem("denkoPickup_iPhone")||"null");
+ if(!d){alert("このiPhoneに保存された案件がありません");return}
+ project.value=d.project||"";site.value=d.site||"";rooms=d.rooms||[];cur=rooms.length-1;
+ render(); alert("このiPhoneの保存データを読み込みました");
+}
+function newProject(){if(confirm("新規案件にしますか？")){project.value="";site.value="";rooms=[];cur=-1;render()}}
+function csv(){let s=expanded(),rows=[["工事名",project.value],["現場名",site.value],[],["メーカー","シリーズ","器具","品番","数量","定価","金額"]],tot=0;Object.entries(s).forEach(([m,q])=>{let p=product(m),c=q*(p?.price||0);tot+=c;rows.push([p?.maker||"",p?.series||"",p?.name||"",m,q,p?.price||0,c])});rows.push([],["材料定価合計","","","","","",tot]);let b="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\n"),u=URL.createObjectURL(new Blob([b],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");a.href=u;a.download=(project.value||"電工拾い出し")+".csv";a.click();URL.revokeObjectURL(u)}
+function render(){sync();renderRooms();renderProducts();renderEstimate();renderParts();renderPins()}
+render();
+</script></body></html>
