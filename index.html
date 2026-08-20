@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>電工拾い出し</title>
+<title>株式会社J.style 拾い出しアプリ</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#f3f4f6;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Noto Sans JP",Arial,sans-serif}
@@ -49,8 +49,8 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px sol
 </head>
 <body>
 <header>
-  <h1>⚡ 電工拾い出し</h1>
-  <p>電気工事・空調工事の数量拾い出し／図面ピン打ち／材料集計</p>
+  <h1>🏢 株式会社J.style</h1><p style="font-size:18px;font-weight:800;margin:5px 0 0">拾い出しアプリ</p>
+  <p>電気工事・空調工事　図面拾い出し／材料集計／見積作成</p>
 </header>
 
 <main>
@@ -81,7 +81,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px sol
 </section>
 
 <section class="card">
-<h2>器具・材料の拾い出し <span class="badge" id="count">0</span></h2>
+<h2>J.style 器具・材料の拾い出し <span class="badge" id="count">0</span></h2>
 <div class="toolbar">
 <select id="maker" onchange="filterSeries()"></select>
 <select id="series" onchange="renderProducts()"></select>
@@ -91,7 +91,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px sol
 </section>
 
 <section class="card">
-<h2>図面拾い</h2>
+<h2>📐 図面拾い出し</h2>
 <div class="notice">図面画像を選択 → 器具を選択 → 図面をタップ。タップした位置にピンを置き、数量も自動加算します。ピンをタップすると削除できます。</div><div class="notice" style="margin-top:7px">📱 iPhoneでは「ファイルから図面を選択」をタップすると、「ファイル」アプリからPDF・画像を選べます。PDFはこの画面内で表示します。</div>
 <div class="toolbar no-print" style="margin-top:9px">
 <label class="blue" style="text-align:center;padding:10px 12px;cursor:pointer;display:block">
@@ -122,7 +122,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px sol
 </section>
 
 <section class="card">
-<h2>材料定価集計</h2>
+<h2>💰 材料定価集計</h2>
 <div id="estimate"></div>
 <div class="summary" style="margin-top:12px">
 <div class="box"><small>材料定価</small><strong id="subTotal">¥0</strong></div>
@@ -136,7 +136,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px sol
 </section>
 
 <section class="card">
-<h2>見積・労務計算</h2>
+<h2>📋 見積・労務計算</h2>
 <div class="notice">材料単価・労務単価は案件ごとに変更できます。数量拾いの結果をそのまま見積計算へ反映できます。</div>
 <div class="tablewrap" style="margin-top:9px">
 <table id="quote"><thead><tr><th>区分</th><th>品名・仕様</th><th>数量</th><th>単位</th><th>材料単価</th><th>労務単価</th><th>材料金額</th><th>労務金額</th><th class="no-print">削除</th></tr></thead><tbody></tbody></table>
@@ -369,16 +369,16 @@ function applyState(d){
  $("matRate").value=d.matRate??100;$("laborRate").value=d.laborRate??100;$("expenseRate").value=d.expenseRate??10;$("taxRate").value=d.taxRate??10;
  $("quote").querySelector("tbody").innerHTML="";(d.quoteRows||[]).forEach(addQuoteRow);render();calcQuote();
 }
-function saveData(){localStorage.setItem("denkoPickupComplete",JSON.stringify(state()));toast("この端末に保存しました")}
-function loadData(){const d=JSON.parse(localStorage.getItem("denkoPickupComplete")||"null");if(!d)return alert("保存データがありません");applyState(d);toast("読み込みました")}
-function exportJSON(){const b=new Blob([JSON.stringify(state(),null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=(($("project").value||"電工拾い出し")+".json");a.click();URL.revokeObjectURL(u)}
+function saveData(){localStorage.setItem("jstylePickupApp",JSON.stringify(state()));toast("この端末に保存しました")}
+function loadData(){const d=JSON.parse(localStorage.getItem("jstylePickupApp")||"null");if(!d)return alert("保存データがありません");applyState(d);toast("読み込みました")}
+function exportJSON(){const b=new Blob([JSON.stringify(state(),null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=(($("project").value||"株式会社J.style 拾い出しアプリ")+".json");a.click();URL.revokeObjectURL(u)}
 $("jsonFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{applyState(JSON.parse(r.result));toast("JSONを復元しました")}catch(_){alert("JSONファイルを読み込めません")}};r.readAsText(f)}
 function newProject(){if(confirm("現在の案件データを消して新規案件にしますか？")){rooms=[];cur=-1;$("project").value="";$("site").value="";$("customer").value="";$("person").value="";$("quote").querySelector("tbody").innerHTML="";render();calcQuote();toast("新規案件にしました")}}
 function csv(){
  const s=expanded(),rows=[["工事名",$("project").value],["現場名",$("site").value],["元請・会社名",$("customer").value],[],["メーカー","シリーズ","器具","品番","数量","定価","金額"]];let tot=0;
  Object.entries(s).forEach(([m,q])=>{const p=product(m),c=q*(p?.price||0);tot+=c;rows.push([p?.maker||"",p?.series||"",p?.name||"",m,q,p?.price||0,c])});
  rows.push([],["材料定価合計","","","","","",tot]);
- const b="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\n"),u=URL.createObjectURL(new Blob([b],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");a.href=u;a.download=(($("project").value||"電工拾い出し")+".csv");a.click();URL.revokeObjectURL(u);
+ const b="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\n"),u=URL.createObjectURL(new Blob([b],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");a.href=u;a.download=(($("project").value||"株式会社J.style 拾い出しアプリ")+".csv");a.click();URL.revokeObjectURL(u);
 }
 function render(){sync();renderRooms();renderProducts();renderEstimate();renderParts();renderPins()}
 render();calcQuote();
