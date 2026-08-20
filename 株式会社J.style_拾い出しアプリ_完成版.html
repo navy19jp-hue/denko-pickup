@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<title>株式会社J.style 拾い出しアプリ</title>
+<style>
+:root{--navy:#101827;--blue:#1976d2;--green:#2e7d32;--bg:#f4f7fa;--card:#fff;--line:#d7dee8;--text:#172033;--muted:#657083;--danger:#c62828;--yellow:#fff3c4}
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:var(--navy);color:#fff;padding:18px 18px 16px;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px #0002}
+header h1{margin:0;font-size:22px} header p{margin:6px 0 0;font-size:13px;color:#d8dfeb}
+main{max-width:1200px;margin:auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px #00000008}
+h2{font-size:18px;margin:0 0 12px} h3{font-size:15px;margin:18px 0 8px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:5px}
+input,select,textarea{width:100%;border:1px solid #cbd4e0;border-radius:10px;padding:11px 12px;font-size:15px;background:#fff;color:var(--text)}
+textarea{min-height:80px;resize:vertical}
+button{border:0;border-radius:10px;padding:11px 14px;font-weight:800;font-size:14px;cursor:pointer}
+.btn-blue{background:var(--blue);color:#fff}.btn-green{background:var(--green);color:#fff}.btn-gray{background:#e9eef5;color:#253044}.btn-red{background:#fff0f0;color:var(--danger);border:1px solid #f2c3c3}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.hint{font-size:12px;color:var(--muted);margin:8px 0 0}
+.drop{border:2px dashed #aeb9c9;border-radius:14px;padding:22px;text-align:center;background:#f9fbfd}
+.drop strong{display:block;font-size:16px;margin-bottom:8px}.drop input{max-width:100%}
+.preview{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#f7f7f7;min-height:120px}
+.preview img{display:block;max-width:100%;max-height:480px;margin:auto}.preview iframe{width:100%;height:480px;border:0}
+table{width:100%;border-collapse:collapse;font-size:13px} th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:middle} th{background:#eef2f7;white-space:nowrap}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+.small{font-size:12px}.num{text-align:right}.status{font-size:11px;background:var(--yellow);padding:5px 7px;border-radius:999px;white-space:nowrap}
+.total{font-size:20px;font-weight:900;text-align:right;padding-top:10px}.muted{color:var(--muted)}
+.master-tools{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:end}
+.hidden{display:none!important}
+.item-form{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;background:#fbfcfe}
+.item-form .grid4{display:grid;grid-template-columns:1fr 1.3fr 1.3fr .8fr;gap:8px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.kpi{background:#f4f7fb;border-radius:12px;padding:12px}.kpi b{display:block;font-size:19px;margin-top:3px}
+footer{padding:10px 14px 30px;text-align:center;color:var(--muted);font-size:11px}
+@media(max-width:700px){
+ main{padding:10px}.grid,.grid3{grid-template-columns:1fr}.item-form .grid4{grid-template-columns:1fr 1fr}.master-tools{grid-template-columns:1fr}
+ header h1{font-size:19px}
+ table{min-width:780px}
+ .preview iframe{height:390px}
+ .kpis{grid-template-columns:1fr 1fr}.kpi:last-child{grid-column:1/-1}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>株式会社J.style 拾い出しアプリ</h1>
+  <p>図面を見ながら手入力 → 自動集計 → 見積データ</p>
+</header>
+<main>
+
+<section class="card">
+<h2>① 図面アップロード</h2>
+<div class="drop">
+  <strong>PDFまたは画像を選択</strong>
+  <input id="drawingFile" type="file" accept=".pdf,image/*">
+  <div id="fileName" class="hint">ファイル未選択</div>
+</div>
+<div id="preview" class="preview hidden"></div>
+<p class="hint">※この完成版はAIで数量を自動確定しません。図面を目で確認し、下の拾い出し表へ入力する方式です。</p>
+</section>
+
+<section class="card">
+<h2>② 案件情報</h2>
+<div class="grid">
+  <div><label>案件名</label><input id="project" placeholder="例：〇〇新築工事"></div>
+  <div><label>施主・客先</label><input id="client" placeholder="例：株式会社〇〇"></div>
+  <div><label>施工場所</label><input id="place" placeholder="例：富山市〇〇"></div>
+  <div><label>図面名称</label><input id="drawingName" placeholder="例：1階 電灯・コンセント図"></div>
+</div>
+</section>
+
+<section class="card">
+<h2>③ 拾い出し入力</h2>
+<div class="kpis">
+  <div class="kpi">登録品目<b id="countKpi">0</b></div>
+  <div class="kpi">総数量<b id="qtyKpi">0</b></div>
+  <div class="kpi">定価合計<b id="totalKpi">¥0</b></div>
+</div>
+
+<div class="actions" style="margin:12px 0">
+  <button class="btn-blue" id="addItem">＋ 項目追加</button>
+  <button class="btn-gray" id="clearItems">全項目クリア</button>
+  <button class="btn-green" id="exportJson">JSON出力</button>
+  <button class="btn-gray" id="exportCsv">CSV出力</button>
+  <button class="btn-gray" id="printBtn">印刷</button>
+</div>
+<div id="items"></div>
+</section>
+
+<section class="card">
+<h2>④ よく使う品目マスター</h2>
+<p class="hint">メーカー・型番/品番・定価を登録すると、次回から選ぶだけで自動入力できます。データはこの端末のブラウザ内に保存されます。</p>
+<div class="master-tools" style="margin-top:10px">
+  <div><label>マスター検索</label><input id="masterSearch" placeholder="メーカー・型番・品名で検索"></div>
+  <button class="btn-blue" id="addMaster">＋ マスター登録</button>
+  <button class="btn-gray" id="resetSample">サンプル追加</button>
+</div>
+<div id="masterList" style="margin-top:10px"></div>
+</section>
+
+<section class="card">
+<h2>⑤ 見積用集計</h2>
+<div class="grid3">
+  <div><label>材料掛率（定価×）</label><input id="rate" type="number" step="0.01" value="1"></div>
+  <div><label>労務費</label><input id="labor" type="number" min="0" value="0"></div>
+  <div><label>諸経費</label><input id="expense" type="number" min="0" value="0"></div>
+</div>
+<div id="quoteTotal" class="total">見積小計 ¥0</div>
+<p class="hint">※定価合計を基準にした簡易見積です。実際の仕入価格・労務単価・経費率は案件ごとに確認してください。</p>
+</section>
+
+</main>
+<footer>株式会社J.style 拾い出しアプリ　—　端末内保存型・手入力確認方式</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+let items=JSON.parse(localStorage.getItem('jstyle_items')||'[]');
+let master=JSON.parse(localStorage.getItem('jstyle_master')||'null');
+
+const sampleMaster=[
+ {id:'s1',cat:'照明',maker:'大光電機',model:'DDL-6222 WW',name:'ダウンライト',price:6400},
+ {id:'s2',cat:'照明',maker:'大光電機',model:'DDL-6224 WW',name:'ダウンライト',price:9000},
+ {id:'s3',cat:'照明',maker:'大光電機',model:'DDL-6282 WW',name:'ダウンライト',price:21500},
+ {id:'s4',cat:'照明',maker:'Fritz Hansen',model:'CARAVAGGIO MATT P2',name:'ペンダント',price:72380},
+ {id:'p1',cat:'コンセント',maker:'Panasonic',model:'',name:'2口コンセント',price:0},
+ {id:'p2',cat:'コンセント',maker:'Panasonic',model:'',name:'アース付コンセント',price:0},
+ {id:'sw1',cat:'スイッチ',maker:'Panasonic',model:'',name:'片切スイッチ',price:0},
+ {id:'sw2',cat:'スイッチ',maker:'Panasonic',model:'',name:'3路スイッチ',price:0},
+ {id:'lan1',cat:'通信',maker:'Panasonic',model:'',name:'LAN端子',price:0},
+ {id:'tv1',cat:'通信',maker:'Panasonic',model:'',name:'TV端子',price:0},
+ {id:'tel1',cat:'通信',maker:'Panasonic',model:'',name:'TEL端子',price:0},
+ {id:'db1',cat:'盤',maker:'Panasonic',model:'',name:'住宅用分電盤',price:0}
+];
+if(!master) master=sampleMaster;
+
+function yen(n){return '¥'+Math.round(Number(n)||0).toLocaleString('ja-JP')}
+function save(){localStorage.setItem('jstyle_items',JSON.stringify(items));localStorage.setItem('jstyle_master',JSON.stringify(master));}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+function renderItems(){
+ const root=$('items'); root.innerHTML='';
+ if(!items.length){root.innerHTML='<p class="muted">まだ項目がありません。「項目追加」から入力してください。</p>'; updateTotals(); return;}
+ items.forEach((it,i)=>{
+  const div=document.createElement('div'); div.className='item-form';
+  div.innerHTML=`
+   <div class="grid4">
+    <div><label>区分</label><select data-k="cat">
+      ${['照明','スイッチ','コンセント','通信','盤','配管・配線','その他'].map(x=>`<option ${it.cat===x?'selected':''}>${x}</option>`).join('')}
+    </select></div>
+    <div><label>メーカー</label><input data-k="maker" value="${esc(it.maker)}" placeholder="メーカー"></div>
+    <div><label>型番/品番</label><input data-k="model" value="${esc(it.model)}" placeholder="型番・品番"></div>
+    <div><label>数量</label><input data-k="qty" type="number" min="0" value="${it.qty||1}"></div>
+   </div>
+   <div class="grid" style="margin-top:8px">
+    <div><label>品名</label><input data-k="name" value="${esc(it.name)}" placeholder="品名"></div>
+    <div><label>定価（円）</label><input data-k="price" type="number" min="0" value="${it.price||0}"></div>
+   </div>
+   <div class="grid" style="margin-top:8px">
+    <div><label>場所・図面メモ</label><input data-k="note" value="${esc(it.note)}" placeholder="例：1階 洋室・南側"></div>
+    <div class="actions" style="align-items:end">
+      <button class="btn-gray" data-action="master">マスターから選択</button>
+      <button class="btn-red" data-action="delete">削除</button>
+    </div>
+   </div>
+   <div class="hint">金額：<b>${yen((it.qty||0)*(it.price||0))}</b>　<span class="status">数量は目視確認</span></div>`;
+  div.querySelectorAll('[data-k]').forEach(el=>el.addEventListener('input',()=>{
+    it[el.dataset.k]=el.type==='number'?Number(el.value):el.value; save(); renderItems();
+  }));
+  div.querySelector('[data-action="delete"]').onclick=()=>{items.splice(i,1);save();renderItems()};
+  div.querySelector('[data-action="master"]').onclick=()=>chooseMaster(i);
+  root.appendChild(div);
+ });
+ updateTotals();
+}
+function chooseMaster(index){
+ const q=prompt('メーカー・型番・品名で検索：');
+ if(q===null)return;
+ const hits=master.filter(m=>(m.maker+' '+m.model+' '+m.name).toLowerCase().includes(q.toLowerCase()));
+ if(!hits.length){alert('該当するマスターがありません。先にマスター登録してください。');return;}
+ const text=hits.map((m,n)=>`${n+1}: ${m.maker} / ${m.model} / ${m.name} / ${yen(m.price)}`).join('\\n');
+ const sel=Number(prompt(text+'\\n\\n番号を入力してください'))-1;
+ if(!hits[sel])return;
+ items[index]={...items[index],cat:hits[sel].cat,maker:hits[sel].maker,model:hits[sel].model,name:hits[sel].name,price:Number(hits[sel].price)||0};
+ save();renderItems();
+}
+function updateTotals(){
+ const qty=items.reduce((s,x)=>s+(Number(x.qty)||0),0);
+ const total=items.reduce((s,x)=>s+(Number(x.qty)||0)*(Number(x.price)||0),0);
+ $('countKpi').textContent=items.length; $('qtyKpi').textContent=qty; $('totalKpi').textContent=yen(total);
+ const rate=Number($('rate').value)||0,labor=Number($('labor').value)||0,expense=Number($('expense').value)||0;
+ $('quoteTotal').textContent='見積小計 '+yen(total*rate+labor+expense);
+}
+function renderMaster(){
+ const q=$('masterSearch').value.toLowerCase();
+ const arr=master.filter(m=>(m.cat+' '+m.maker+' '+m.model+' '+m.name).toLowerCase().includes(q));
+ $('masterList').innerHTML=arr.map(m=>`
+ <div class="item-form">
+  <div class="grid4">
+   <div><label>区分</label><input data-mid="${m.id}" data-k="cat" value="${esc(m.cat)}"></div>
+   <div><label>メーカー</label><input data-mid="${m.id}" data-k="maker" value="${esc(m.maker)}"></div>
+   <div><label>型番/品番</label><input data-mid="${m.id}" data-k="model" value="${esc(m.model)}"></div>
+   <div><label>定価</label><input data-mid="${m.id}" data-k="price" type="number" value="${m.price||0}"></div>
+  </div>
+  <div class="grid" style="margin-top:8px">
+   <div><label>品名</label><input data-mid="${m.id}" data-k="name" value="${esc(m.name)}"></div>
+   <div class="actions" style="align-items:end"><button class="btn-red" data-del="${m.id}">削除</button></div>
+  </div>
+ </div>`).join('') || '<p class="muted">該当なし</p>';
+ document.querySelectorAll('[data-mid]').forEach(el=>el.oninput=()=>{
+   const m=master.find(x=>x.id===el.dataset.mid); if(!m)return;
+   m[el.dataset.k]=el.type==='number'?Number(el.value):el.value; save();
+ });
+ document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{master=master.filter(x=>x.id!==b.dataset.del);save();renderMaster()});
+}
+$('addItem').onclick=()=>{items.push({cat:'照明',maker:'',model:'',name:'',price:0,qty:1,note:''});save();renderItems()};
+$('clearItems').onclick=()=>{if(confirm('拾い出し項目をすべて削除しますか？')){items=[];save();renderItems()}};
+$('addMaster').onclick=()=>{master.push({id:'m'+Date.now(),cat:'その他',maker:'',model:'',name:'',price:0});save();renderMaster()};
+$('resetSample').onclick=()=>{if(confirm('サンプル品目を追加しますか？')){sampleMaster.forEach(s=>{if(!master.some(m=>m.maker===s.maker&&m.model===s.model&&m.name===s.name))master.push({...s,id:'m'+Date.now()+Math.random()})});save();renderMaster()}};
+$('masterSearch').oninput=renderMaster;
+['rate','labor','expense'].forEach(id=>$(id).oninput=updateTotals);
+
+$('drawingFile').onchange=e=>{
+ const f=e.target.files[0]; if(!f){$('fileName').textContent='ファイル未選択';return}
+ $('fileName').textContent=`選択：${f.name}（${Math.round(f.size/1024)} KB）`;
+ const url=URL.createObjectURL(f), p=$('preview'); p.classList.remove('hidden');
+ p.innerHTML='';
+ if(f.type.startsWith('image/')){const img=document.createElement('img');img.src=url;p.appendChild(img)}
+ else if(f.type==='application/pdf' || f.name.toLowerCase().endsWith('.pdf')){const iframe=document.createElement('iframe');iframe.src=url;p.appendChild(iframe)}
+ else p.textContent='このファイル形式はプレビューできません。';
+};
+$('exportJson').onclick=()=>{
+ const data={app:'株式会社J.style 拾い出しアプリ',project:{project:$('project').value,client:$('client').value,place:$('place').value,drawingName:$('drawingName').value},items,quote:{rate:Number($('rate').value)||0,labor:Number($('labor').value)||0,expense:Number($('expense').value)||0},createdAt:new Date().toISOString()};
+ download('jstyle_拾い出しデータ.json',JSON.stringify(data,null,2),'application/json');
+};
+$('exportCsv').onclick=()=>{
+ const rows=[['区分','メーカー','型番/品番','品名','定価','数量','金額','場所・図面メモ'],...items.map(x=>[x.cat,x.maker,x.model,x.name,x.price,x.qty,(Number(x.price)||0)*(Number(x.qty)||0),x.note])];
+ const csv='\\ufeff'+rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\\n');
+ download('jstyle_拾い出し.csv',csv,'text/csv');
+};
+function download(name,data,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+$('printBtn').onclick=()=>window.print();
+
+renderItems();renderMaster();updateTotals();
+</script>
+</body>
+</html>
