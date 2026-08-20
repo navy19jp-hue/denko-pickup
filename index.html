@@ -75,7 +75,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px sol
 <h2>部屋・エリア</h2>
 <div class="toolbar">
 <input id="roomName" placeholder="例：1F事務室">
-<button class="blue" onclick="addRoom()">＋ 部屋追加</button><button class="gray" onclick="renameRoom()">部屋名変更</button><button class="danger" onclick="deleteRoom()">部屋削除</button>
+<button class="blue" onclick="addRoom()">＋ 部屋追加</button>
 </div>
 <div id="rooms" class="tabs" style="margin-top:9px"></div>
 </section>
@@ -88,22 +88,27 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px sol
 <input id="search" placeholder="品番・器具名で検索" oninput="renderProducts()">
 </div>
 <div id="products" class="grid-products" style="margin-top:10px"></div>
-<div class="notice" style="margin-top:10px">品番・単価が登録されていない器具は「自由項目」で追加できます。</div>
-<div class="toolbar" style="margin-top:8px">
-<input id="customName" placeholder="自由項目名（例：LED照明 40形2灯）">
-<input id="customModel" placeholder="品番・型式（任意）">
-<input id="customPrice" type="number" min="0" placeholder="定価">
-<button class="blue" onclick="addCustomProduct()">＋ 自由項目を登録</button>
-</div>
 </section>
 
 <section class="card">
 <h2>図面拾い</h2>
-<div class="notice">図面画像を選択 → 器具を選択 → 図面をタップ。タップした位置にピンを置き、数量も自動加算します。ピンをタップすると削除できます。</div>
+<div class="notice">図面画像を選択 → 器具を選択 → 図面をタップ。タップした位置にピンを置き、数量も自動加算します。ピンをタップすると削除できます。</div><div class="notice" style="margin-top:7px">📱 iPhoneでは「ファイルから図面を選択」をタップすると、「ファイル」アプリからPDF・画像を選べます。PDFはこの画面内で表示します。</div>
 <div class="toolbar no-print" style="margin-top:9px">
-<input id="file" type="file" accept="image/*">
+<label class="blue" style="text-align:center;padding:10px 12px;cursor:pointer;display:block">
+📂 iPhoneの「ファイル」から図面を選択
+<input id="file" type="file" accept="application/pdf,image/*" style="display:none">
+</label>
 <select id="pinModel"></select>
 <button class="gray" onclick="clearPins()">この部屋のピンを全削除</button>
+</div>
+<div id="pdfInfo" class="notice hidden" style="margin-top:9px"></div>
+<div id="pdfViewer" class="hidden" style="margin-top:9px">
+<div class="toolbar no-print">
+<button class="gray" onclick="pdfPrev()">‹ 前ページ</button>
+<div id="pdfPageLabel" style="flex:1;text-align:center;padding:10px;font-weight:700"></div>
+<button class="gray" onclick="pdfNext()">次ページ ›</button>
+</div>
+<iframe id="pdfFrame" style="width:100%;height:65vh;min-height:500px;border:1px solid #cbd5e1;border-radius:12px;background:#fff"></iframe>
 </div>
 <div class="plan" id="plan" style="margin-top:9px">
 <canvas id="canvas" width="1200" height="700"></canvas>
@@ -137,7 +142,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px sol
 <table id="quote"><thead><tr><th>区分</th><th>品名・仕様</th><th>数量</th><th>単位</th><th>材料単価</th><th>労務単価</th><th>材料金額</th><th>労務金額</th><th class="no-print">削除</th></tr></thead><tbody></tbody></table>
 </div>
 <div class="toolbar no-print" style="margin-top:9px">
-<button class="blue" onclick="addQuoteRow()">＋ 項目追加</button><button class="green" onclick="pickupToQuote()">拾い出しを見積へ反映</button>
+<button class="blue" onclick="addQuoteRow()">＋ 項目追加</button>
 <button class="gray" onclick="addPresetQuote()">標準項目追加</button>
 <button class="danger" onclick="clearQuote()">全削除</button>
 </div>
@@ -165,7 +170,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px sol
 <div id="toast" class="toast"></div>
 
 <script>
-let P=[
+const P=[
 ["Panasonic","コスモシリーズ ワイド21","片切スイッチ","WT5001",280],
 ["Panasonic","コスモシリーズ ワイド21","3路スイッチ","WT5002",450],
 ["Panasonic","コスモシリーズ ワイド21","4路スイッチ","WT50049",1440],
@@ -246,16 +251,6 @@ function renderProducts(){
    $("products").appendChild(d);
  });
 }
-function addCustomProduct(){
- const name=$("customName").value.trim(); if(!name){alert("自由項目名を入力してください");return}
- const model=$("customModel").value.trim()||("CUSTOM-"+Date.now()); const price=Number($("customPrice").value)||0;
- if(P.some(x=>x.model===model)){alert("同じ品番・型式が登録されています");return}
- P.push({maker:"自由登録",series:"自由項目",name,model,price});
- $("customName").value="";$("customModel").value="";$("customPrice").value="";sync();$("maker").value="自由登録";filterSeries();toast("自由項目を登録しました");
-}
-function renameRoom(){if(cur<0)return alert("部屋を選択してください");const n=prompt("新しい部屋名",rooms[cur].name);if(n&&n.trim()){rooms[cur].name=n.trim();render();}}
-function deleteRoom(){if(cur<0)return alert("部屋を選択してください");if(confirm(`「${rooms[cur].name}」を削除しますか？`)){rooms.splice(cur,1);cur=Math.min(cur,rooms.length-1);render();}}
-
 function addRoom(){
  const n=$("roomName").value.trim();if(!n)return;
  rooms.push({name:n,items:{},pins:[]});cur=rooms.length-1;$("roomName").value="";render();toast("部屋を追加しました");
@@ -303,7 +298,40 @@ function draw(){
  if(img){const s=Math.min(1200/img.width,700/img.height),w=img.width*s,h=img.height*s;cx.drawImage(img,(1200-w)/2,(700-h)/2,w,h)}
  else{cx.fillStyle="#f8fafc";cx.fillRect(0,0,1200,700);cx.fillStyle="#94a3b8";cx.font="22px sans-serif";cx.textAlign="center";cx.fillText("図面画像を選択してください",600,350)}
 }
-$("file").onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{img=im;draw();renderPins()};im.src=URL.createObjectURL(f)};
+let pdfUrl=null,pdfPage=1,pdfPagesKnown=false;
+$("file").onchange=e=>{
+ const f=e.target.files[0];
+ if(!f)return;
+ if(pdfUrl){URL.revokeObjectURL(pdfUrl);pdfUrl=null}
+ const url=URL.createObjectURL(f);
+ $("pdfInfo").classList.remove("hidden");
+ $("pdfInfo").textContent=`選択中：${f.name}（${Math.max(1,Math.round(f.size/1024))}KB）`;
+ if(f.type==="application/pdf" || f.name.toLowerCase().endsWith(".pdf")){
+   pdfUrl=url;pdfPage=1;pdfPagesKnown=false;
+   $("pdfViewer").classList.remove("hidden");
+   $("pdfFrame").src=url;
+   $("pdfPageLabel").textContent="PDFを表示中（ページ切替はPDFビューア側にも対応）";
+   $("plan").classList.add("hidden");
+ }else{
+   $("pdfViewer").classList.add("hidden");
+   $("plan").classList.remove("hidden");
+   const im=new Image();
+   im.onload=()=>{img=im;draw();renderPins()};
+   im.src=url;
+ }
+};
+function pdfPrev(){
+ if(!pdfUrl)return;
+ pdfPage=Math.max(1,pdfPage-1);
+ $("pdfFrame").src=pdfUrl+"#page="+pdfPage;
+ $("pdfPageLabel").textContent="PDF ページ "+pdfPage;
+}
+function pdfNext(){
+ if(!pdfUrl)return;
+ pdfPage++;
+ $("pdfFrame").src=pdfUrl+"#page="+pdfPage;
+ $("pdfPageLabel").textContent="PDF ページ "+pdfPage;
+}
 cv.onclick=e=>{
  if(cur<0){alert("先に部屋を追加してください");return}
  const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*1200,y=(e.clientY-r.top)/r.height*700,m=$("pinModel").value;if(!m)return;
@@ -311,8 +339,8 @@ cv.onclick=e=>{
 };
 function renderPins(){
  draw();document.querySelectorAll(".pin").forEach(x=>x.remove());if(cur<0)return;
- rooms[cur].pins.forEach((p,i)=>{const b=document.createElement("button");b.className="pin";b.textContent="+";b.title=product(p.model)?.name||p.model;b.style.left=p.x/1200*100+"%";b.style.top=p.y/700*100+"%";
- b.onclick=e=>{e.stopPropagation();if(confirm((product(p.model)?.name||p.model)+" のピンを削除しますか？")){rooms[cur].pins.splice(i,1);rooms[cur].items[p.model]=Math.max(0,(rooms[cur].items[p.model]||0)-1);render()}};$("plan").appendChild(b)});
+ rooms[cur].pins.forEach((p,i)=>{const b=document.createElement("button");b.className="pin";b.textContent="＋";b.style.left=p.x/1200*100+"%";b.style.top=p.y/700*100+"%";
+ b.onclick=e=>{e.stopPropagation();if(confirm("このピンを削除しますか？")){rooms[cur].pins.splice(i,1);pick(p.model,-1)}};$("plan").appendChild(b)});
 }
 function clearPins(){if(cur<0)return;if(confirm("この部屋のピンを全て削除しますか？")){rooms[cur].pins=[];render()}}
 function addQuoteRow(d=["","",1,"式",0,0]){
@@ -333,16 +361,9 @@ function calcQuote(){
  const ex=(m+l)*(+$("expenseRate").value||0)/100,sub=m+l+ex,tax=sub*(+$("taxRate").value||0)/100;
  $("matTotal").textContent=yen(m);$("laborTotal").textContent=yen(l);$("expenseTotal").textContent=yen(ex);$("grandTotal").textContent=yen(sub+tax);
 }
-function pickupToQuote(){
- const s=expanded(); let added=0;
- Object.entries(s).forEach(([m,q])=>{const p=product(m); if(!p)return; addQuoteRow(["拾い出し",`${p.name} ${p.model}`,q,"個",p.price||0,0]);added++;});
- if(added) toast(added+"項目を見積へ反映しました"); else alert("拾い出しデータがありません");
-}
-
 function quoteRows(){return [...$("quote").querySelectorAll("tbody tr")].map(t=>[t.cells[0].querySelector("input").value,t.cells[1].querySelector("input").value,t.cells[2].querySelector("input").value,t.cells[3].querySelector("input").value,t.cells[4].querySelector("input").value,t.cells[5].querySelector("input").value])}
-function state(){return{version:3,products:P,project:$("project").value,site:$("site").value,customer:$("customer").value,person:$("person").value,rooms,matRate:$("matRate").value,laborRate:$("laborRate").value,expenseRate:$("expenseRate").value,taxRate:$("taxRate").value,quoteRows:quoteRows()}}
+function state(){return{version:2,project:$("project").value,site:$("site").value,customer:$("customer").value,person:$("person").value,rooms,matRate:$("matRate").value,laborRate:$("laborRate").value,expenseRate:$("expenseRate").value,taxRate:$("taxRate").value,quoteRows:quoteRows()}}
 function applyState(d){
- if(Array.isArray(d.products)){P.length=0;d.products.forEach(x=>P.push(x));}
  $("project").value=d.project||"";$("site").value=d.site||"";$("customer").value=d.customer||"";$("person").value=d.person||"";
  rooms=Array.isArray(d.rooms)?d.rooms:[];cur=rooms.length?rooms.length-1:-1;
  $("matRate").value=d.matRate??100;$("laborRate").value=d.laborRate??100;$("expenseRate").value=d.expenseRate??10;$("taxRate").value=d.taxRate??10;
@@ -361,8 +382,6 @@ function csv(){
 }
 function render(){sync();renderRooms();renderProducts();renderEstimate();renderParts();renderPins()}
 render();calcQuote();
-document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")localStorage.setItem("denkoPickupComplete",JSON.stringify(state()))});
-window.addEventListener("beforeunload",()=>localStorage.setItem("denkoPickupComplete",JSON.stringify(state())));
 </script>
 </body>
 </html>
