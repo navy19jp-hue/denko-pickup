@@ -121,6 +121,39 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px sol
 <div id="parts" style="margin-top:8px"></div>
 </section>
 
+
+<section class="card">
+<h2>🤖 J.style AI拾い出し準備</h2>
+<div class="notice">
+PDF図面をアップロードしたあと、ページを確認しながら「拾い出し候補」を登録できます。
+この版ではまず <b>PDFページ確認 → 器具候補登録 → 数量集計</b> を安定させています。
+将来のAI解析機能を追加できる構造です。
+</div>
+<div class="grid" style="margin-top:10px">
+  <div class="field"><label>拾い出しカテゴリ</label>
+    <select id="aiCategory">
+      <option>コンセント</option><option>スイッチ</option><option>照明</option>
+      <option>LAN</option><option>電話</option><option>分電盤</option>
+      <option>ブレーカー</option><option>配管</option><option>ケーブル</option>
+      <option>エアコン電源</option><option>その他</option>
+    </select>
+  </div>
+  <div class="field"><label>器具・品番候補</label>
+    <input id="aiModel" placeholder="例：WT50529 / LED照明">
+  </div>
+  <div class="field"><label>数量</label>
+    <input id="aiQty" type="number" min="1" value="1">
+  </div>
+  <div class="field"><label>確認メモ</label>
+    <input id="aiNote" placeholder="例：1F事務室 東壁">
+  </div>
+</div>
+<div class="toolbar no-print" style="margin-top:9px">
+  <button class="blue" onclick="addAICandidate()">＋ 拾い出し候補に追加</button>
+  <button class="gray" onclick="clearAICandidates()">候補を全削除</button>
+</div>
+<div id="aiCandidates" style="margin-top:10px"></div>
+</section>
 <section class="card">
 <h2>💰 材料定価集計</h2>
 <div id="estimate"></div>
@@ -380,7 +413,37 @@ function csv(){
  rows.push([],["材料定価合計","","","","","",tot]);
  const b="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\n"),u=URL.createObjectURL(new Blob([b],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");a.href=u;a.download=(($("project").value||"株式会社J.style 拾い出しアプリ")+".csv");a.click();URL.revokeObjectURL(u);
 }
-function render(){sync();renderRooms();renderProducts();renderEstimate();renderParts();renderPins()}
+
+let aiCandidates = JSON.parse(localStorage.getItem("jstyleAICandidates") || "[]");
+
+function addAICandidate(){
+  const category=$("aiCategory").value;
+  const model=$("aiModel").value.trim();
+  const qty=Math.max(1,+$("aiQty").value||1);
+  const note=$("aiNote").value.trim();
+  if(!model){alert("器具名または品番を入力してください");return}
+  aiCandidates.push({room:cur>=0?rooms[cur].name:"未指定",category,model,qty,note});
+  localStorage.setItem("jstyleAICandidates",JSON.stringify(aiCandidates));
+  $("aiModel").value="";$("aiNote").value="";$("aiQty").value=1;
+  renderAICandidates();toast("拾い出し候補を追加しました");
+}
+function clearAICandidates(){
+  if(!confirm("拾い出し候補を全て削除しますか？"))return;
+  aiCandidates=[];localStorage.setItem("jstyleAICandidates","[]");renderAICandidates();
+}
+function renderAICandidates(){
+  const el=$("aiCandidates");
+  if(!aiCandidates.length){el.innerHTML='<div class="muted">拾い出し候補はありません</div>';return}
+  el.innerHTML=aiCandidates.map((x,i)=>`
+    <div class="list">
+      <span><b>${esc(x.category)}</b> / ${esc(x.model)}<br>
+      <small class="muted">${esc(x.room)} ${x.note?"/ "+esc(x.note):""}</small></span>
+      <b>${x.qty}</b><span></span>
+      <button class="danger no-print" onclick="aiCandidates.splice(${i},1);localStorage.setItem('jstyleAICandidates',JSON.stringify(aiCandidates));renderAICandidates()">削除</button>
+    </div>`).join("");
+}
+
+function render(){sync();renderRooms();renderProducts();renderEstimate();renderParts();renderPins();renderAICandidates()}
 render();calcQuote();
 </script>
 </body>
