@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>株式会社J.style 拾い出し Ver.9</title>
+<style>
+:root{--bg:#080d18;--panel:#101725;--text:#f4f7fb;--muted:#8f9caf;--line:#27344b;--green:#328848;--green2:#5bb86d;--orange:#ff9a70}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#080d18,#0b1220 55%,#080d18);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:620px;margin:auto;min-height:100vh}
+button,input,select{font:inherit}button{border:0;color:var(--text);cursor:pointer}.header{position:sticky;top:0;z-index:30;background:rgba(8,13,24,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px}.top{display:flex;align-items:center;gap:10px}.top h1{font-size:20px;margin:0;flex:1}.badge{font-size:11px;padding:5px 8px;border:1px solid #34425a;border-radius:999px;color:#b7c3d4}
+main{padding:12px}.card{background:var(--panel);border:1px solid #26334a;border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:0 10px 28px rgba(0,0,0,.18)}h2{font-size:17px;margin:0 0 12px}label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+input,select{width:100%;background:#090f1b;color:var(--text);border:1px solid #2b3a54;border-radius:12px;padding:12px;outline:none}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tabs{display:flex;gap:7px;overflow:auto;padding-bottom:3px}.tab{white-space:nowrap;background:#121b2a;border:1px solid #31405a;border-radius:12px;padding:10px 12px}.tab.active{background:#2e8a4a;border-color:var(--green2);font-weight:800}
+.primary{background:var(--green);padding:12px;border-radius:12px;font-weight:800}.secondary{background:#182235;padding:12px;border-radius:12px;border:1px solid #31405a}.danger{background:#5b1822;padding:7px 10px;border-radius:9px}
+.roombar{display:flex;gap:8px;align-items:center;margin-bottom:10px}.roombar select{flex:1}.room-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}.room-card{background:#0b1220;border:1px solid #26334a;border-radius:12px;padding:10px;cursor:pointer}.room-card.active{border-color:var(--green2);background:#13251a}.room-card b{display:block}.room-meta{font-size:11px;color:var(--muted);margin-top:3px}.room-add{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}
+.note,.small{font-size:11px;color:#aeb9c9;line-height:1.6}.product{background:#0b1220;border:1px solid #26334a;border-radius:14px;padding:12px;margin-top:8px}.product-row{display:flex;gap:10px;align-items:center}.product-info{flex:1;min-width:0}.name{font-weight:800}.code{color:var(--orange);font-weight:800;margin-top:3px}.meta{color:var(--muted);font-size:12px;margin-top:4px}
+.actions{display:flex;align-items:center;gap:5px;flex-shrink:0}.qty-btn{width:34px;height:38px;border-radius:9px;background:#1b293e;border:1px solid #33435d;font-size:20px}.qty-num{min-width:28px;text-align:center;font-weight:800}.use{background:#162235;border:1px solid #33435d;border-radius:10px;padding:9px 12px;font-weight:800}.use.active{background:#2e8a4a;border-color:var(--green2)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.kpi{background:#0b1220;border:1px solid #26334a;border-radius:12px;padding:10px;font-size:11px;color:var(--muted)}.kpi b{display:block;color:var(--text);font-size:18px;margin-top:3px}
+.result-room{margin-top:12px;padding:10px;background:#0b1220;border:1px solid #26334a;border-radius:14px}.result-room-title{display:flex;justify-content:space-between;align-items:center;font-weight:800;padding-bottom:7px;border-bottom:1px solid #26334a}.result-room-title span{font-size:11px;color:var(--muted);font-weight:400}.result-row{display:grid;grid-template-columns:1fr 48px 92px;gap:6px;align-items:center;padding:10px 0;border-bottom:1px solid #1d2940;font-size:13px}.result-row:last-child{border-bottom:0}.result-qty{text-align:center;font-weight:800}.result-total{text-align:right}.toolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.empty{padding:15px 0;color:var(--muted);font-size:12px}.status{margin-bottom:10px;padding:9px 10px;border-radius:10px;background:#13251a;border:1px solid #315a3a;color:#a9dfb2;font-size:12px}.status.error{background:#34151a;border-color:#6a2a34;color:#ffc2c9}.room-badge{display:inline-block;font-size:10px;padding:3px 7px;border-radius:999px;background:#172235;color:#aeb9c9;margin-left:5px}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.room-list{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.kpi:last-child{grid-column:1/-1}.product-row{align-items:flex-start}.actions{padding-top:2px}.result-row{grid-template-columns:1fr 42px 82px}}
+
+/* Ver.9 商品マスター管理 */
+.master-tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.master-btn{border:1px solid var(--line);background:#172239;color:var(--text);border-radius:12px;padding:10px 14px;font-weight:700}
+.master-btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+.master-count{color:var(--muted);font-size:13px;margin-left:auto;align-self:center}
+.master-editor{display:none;margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:16px;background:#0c1322}
+.master-editor.open{display:block}
+.master-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.master-grid label{font-size:12px;color:var(--muted)}
+.master-grid input,.master-grid select{width:100%;margin-top:5px;background:#080e1b;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px}
+.master-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.master-row:last-child{border-bottom:0}
+.master-meta{font-size:12px;color:var(--muted);margin-top:3px}
+.master-actions{display:flex;gap:6px}
+.master-actions button{border:1px solid var(--line);background:#172239;color:var(--text);border-radius:9px;padding:7px 9px}
+.master-actions .del{color:#ff8b8b}
+@media(max-width:560px){.master-grid{grid-template-columns:1fr}.master-count{margin-left:0;width:100%}}
+
+</style>
+</head>
+<body><div class="app">
+<header class="header"><div class="top"><h1>株式会社J.style 拾い出し</h1><span class="badge">Ver.9</span></div></header>
+<main>
+<section class="card"><h2>① 案件情報</h2><div class="grid"><div><label>案件名</label><input id="project" placeholder="例：〇〇新築工事"></div><div><label>施主・客先</label><input id="client" placeholder="例：株式会社〇〇"></div><div><label>施工場所</label><input id="place" placeholder="例：富山市〇〇"></div><div><label>図面名称</label><input id="drawing" placeholder="例：1階 電灯・コンセント図"></div></div></section>
+<section class="card"><h2>② 部屋・場所</h2><div class="status" id="status">部屋を選択してください。</div><div class="roombar"><select id="roomSelect"></select><button class="secondary" onclick="selectRoomFromDropdown()">選択</button></div><div id="roomList" class="room-list"></div><div class="room-add"><input id="roomName" placeholder="例：1階 事務室"><button class="primary" onclick="addRoom()">部屋追加</button></div><div class="note" style="margin-top:8px">部屋を選択してから商品を登録します。商品ごとに「−」「個数」「＋」で追加数量を決め、「使う」を押してください。</div></section>
+
+<div id="masterManager" class="card">
+  <h2>③ 商品マスター</h2>
+  <div class="master-tools">
+    <button type="button" class="master-btn primary" id="addMasterBtn">＋ 器具を追加</button>
+    <button type="button" class="master-btn" id="exportMasterBtn">マスター書き出し</button>
+    <button type="button" class="master-btn" id="importMasterBtn">マスター読み込み</button>
+    <input id="masterFileInput" type="file" accept=".json,.csv" hidden>
+    <span id="masterCount" class="master-count"></span>
+  </div>
+  <div id="masterEditor" class="master-editor">
+    <div class="master-grid">
+      <label>メーカー
+        <input id="mMaker" placeholder="例：Panasonic">
+      </label>
+      <label>シリーズ
+        <input id="mSeries" placeholder="例：コスモシリーズ ワイド21">
+      </label>
+      <label>商品名
+        <input id="mName" placeholder="例：埋込スイッチ">
+      </label>
+      <label>型番
+        <input id="mCode" placeholder="例：WT5001">
+      </label>
+      <label>定価（税抜）
+        <input id="mPrice" type="number" min="0" step="1" placeholder="250">
+      </label>
+    </div>
+    <div class="master-tools">
+      <button type="button" class="master-btn primary" id="saveMasterBtn">保存</button>
+      <button type="button" class="master-btn" id="cancelMasterBtn">キャンセル</button>
+    </div>
+  </div>
+  <div id="masterList"></div>
+</div>
+<div class="tabs" id="seriesTabs"></div><div style="height:8px"></div><input id="search" placeholder="商品名・型番で検索"><div id="list"></div></section>
+<section class="card"><h2>④ 拾い出し結果</h2><div class="kpis"><div class="kpi">登録品目<b id="count">0</b></div><div class="kpi">総数量<b id="qty">0</b></div><div class="kpi">定価合計<b id="total">¥0</b></div></div><div id="results"></div><div class="toolbar"><button class="primary" onclick="copyCSV()">CSVコピー</button><button class="secondary" onclick="clearAll()">全クリア</button></div></section>
+<section class="card"><h2>⑤ 仕様</h2><div class="note">・部屋ごとに拾い出しを完全に分けて管理<br>・商品ごとに数量を − / ＋ で調整<br>・「使う」で現在の個数をその部屋へ登録<br>・同じ商品を同じ部屋で再登録すると数量を加算<br>・部屋別・全体の数量と定価合計を自動集計<br>・商品マスターは現在のVer.7の <strong>P</strong> データを自動読み込み</div></section>
+</main><footer class="note" style="text-align:center;padding:10px 14px 30px">株式会社J.style 拾い出し Ver.9</footer></div>
+<script>
+let P=[],rooms=[{id:'common',name:'共通・未分類'}],selectedRoom='common',selectedSeries='すべて';const draftQty={},used={};
+const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])),money=n=>'¥'+Number(n||0).toLocaleString('ja-JP'),roomById=id=>rooms.find(r=>r.id===id)||rooms[0],roomTotal=id=>Object.values(used).filter(x=>x.roomId===id).reduce((s,x)=>s+x.qty,0);
+function setStatus(msg,error=false){const e=document.getElementById('status');e.textContent=msg;e.className='status'+(error?' error':'')}
+async function loadProducts(){try{const t=await fetch('./index.html?source='+Date.now()).then(r=>{if(!r.ok)throw Error();return r.text()});const m=t.match(/const\s+P\s*=\s*(\[[\s\S]*?\]);/);if(!m)throw Error();P=JSON.parse(m[1]);init()}catch(e){setStatus('商品マスターの読み込みに失敗しました。Ver.7のindex.htmlを確認してください。',true)}}
+function init(){
+  renderSeriesTabs();
+  renderRooms();
+  renderProducts();
+  renderResults();
+}
+function renderSeriesTabs(){
+  const series=['すべて',...new Set(P.map(x=>x[1]))];
+  document.getElementById('seriesTabs').innerHTML=series.map(s=>
+    `<button type="button" class="tab ${s===selectedSeries?'active':''}" data-series="${esc(s)}">${esc(s)}</button>`
+  ).join('');
+  document.querySelectorAll('#seriesTabs .tab').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      selectedSeries=btn.dataset.series;
+      renderSeriesTabs();
+      renderProducts();
+    });
+  });
+}
+function setSeries(s){
+  selectedSeries=s;
+  renderSeriesTabs();
+  renderProducts();
+}
+function renderRooms(){document.getElementById('roomSelect').innerHTML=rooms.map(r=>`<option value="${esc(r.id)}" ${r.id===selectedRoom?'selected':''}>${esc(r.name)}</option>`).join('');document.getElementById('roomList').innerHTML=rooms.map(r=>`<div class="room-card ${r.id===selectedRoom?'active':''}" onclick="selectRoom('${r.id}')"><b>${esc(r.name)}</b><div class="room-meta">${roomTotal(r.id)}個 登録</div></div>`).join('')}
+function selectRoom(id){selectedRoom=id;renderRooms();renderProducts();renderResults();setStatus('選択中：'+roomById(id).name)}function selectRoomFromDropdown(){selectRoom(document.getElementById('roomSelect').value)}
+function addRoom(){const i=document.getElementById('roomName'),name=i.value.trim();if(!name)return;const id='room_'+Date.now().toString(36);rooms.push({id,name});selectedRoom=id;i.value='';renderRooms();renderProducts();renderResults();setStatus('選択中：'+name)}
+function filtered(){const q=document.getElementById('search').value.trim().toLowerCase();return P.filter(x=>(selectedSeries==='すべて'||x[1]===selectedSeries)&&(!q||String(x[2]).toLowerCase().includes(q)||String(x[3]).toLowerCase().includes(q)))}
+function changeDraft(code,d){draftQty[code]=Math.max(1,(draftQty[code]||1)+d);renderProducts()}
+function useProduct(p){const q=Math.max(1,draftQty[p[3]]||1),k=selectedRoom+'|'+p[3];if(!used[k])used[k]={roomId:selectedRoom,name:p[2],code:p[3],series:p[1],price:Number(p[4]||0),qty:0};used[k].qty+=q;draftQty[p[3]]=1;renderRooms();renderProducts();renderResults();setStatus(`${roomById(selectedRoom).name} に ${p[2]} を ${q}個 登録しました。`)}
+function adjustUsed(k,d){if(!used[k])return;used[k].qty=Math.max(0,used[k].qty+d);if(!used[k].qty)delete used[k];renderRooms();renderProducts();renderResults()}
+function renderProducts(){const a=filtered();document.getElementById('list').innerHTML=a.length?a.map(p=>{const d=draftQty[p[3]]||1,k=selectedRoom+'|'+p[3],u=used[k]?.qty||0;return `<div class="product"><div class="product-row"><div class="product-info"><div class="name">${esc(p[2])}</div><div class="code">${esc(p[3])}</div><div class="meta">${esc(p[0])} / ${esc(p[1])} / 定価 ${money(p[4])}（税抜）${u?`<span class="room-badge">この部屋 ${u}個</span>`:''}</div></div><div class="actions"><button class="qty-btn" onclick="changeDraft('${esc(p[3])}',-1)">−</button><span class="qty-num">${d}</span><button class="qty-btn" onclick="changeDraft('${esc(p[3])}',1)">＋</button><button class="use ${u?'active':''}" onclick='useProduct(${JSON.stringify(p).replace(/</g,'\\u003c')})'>使う</button></div></div></div>`}).join(''):'<div class="empty">該当する商品がありません。</div>'}
+function renderResults(){const a=Object.values(used),q=a.reduce((s,x)=>s+x.qty,0),t=a.reduce((s,x)=>s+x.qty*x.price,0);document.getElementById('count').textContent=a.length;document.getElementById('qty').textContent=q;document.getElementById('total').textContent=money(t);if(!a.length){document.getElementById('results').innerHTML='<div class="empty">まだ拾い出し結果がありません。</div>';return}document.getElementById('results').innerHTML=rooms.map(r=>{const it=a.filter(x=>x.roomId===r.id);if(!it.length)return '';const rt=it.reduce((s,x)=>s+x.qty*x.price,0);return `<div class="result-room"><div class="result-room-title"><span>${esc(r.name)}</span><span>${it.reduce((s,x)=>s+x.qty,0)}個 / ${money(rt)}</span></div>${it.map(x=>{const k=x.roomId+'|'+x.code;return `<div class="result-row"><div><b>${esc(x.name)}</b><div class="small">${esc(x.code)} / ${esc(x.series)}</div></div><div class="result-qty">${x.qty}</div><div class="result-total">${money(x.qty*x.price)}<br><button class="danger" onclick="adjustUsed('${esc(k)}',-1)">−1</button></div></div>`}).join('')}</div>`}).join('')}
+function copyCSV(){const rows=[['部屋','シリーズ','商品名','型番','数量','単価(税抜)','金額(税抜)'],...Object.values(used).map(x=>[roomById(x.roomId).name,x.series,x.name,x.code,x.qty,x.price,x.qty*x.price])],csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');navigator.clipboard.writeText(csv).then(()=>setStatus('CSVをコピーしました。')).catch(()=>setStatus('CSVコピーに失敗しました。',true))}
+function clearAll(){if(!Object.keys(used).length)return;if(!confirm('拾い出し結果をすべて削除しますか？'))return;for(const k in used)delete used[k];renderRooms();renderProducts();renderResults();setStatus('拾い出し結果を全クリアしました。')}
+document.getElementById('search').addEventListener('input',renderProducts);
+loadProducts();
+
+/* ===== Ver.9 商品マスター管理 ===== */
+const MASTER_KEY='jstyle_pickup_master_v9';
+let masterEditIndex=-1;
+
+function getMaster(){
+  try{
+    const raw=localStorage.getItem(MASTER_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return Array.isArray(window.P) ? window.P.slice() : [];
+}
+function saveMasterData(list){
+  localStorage.setItem(MASTER_KEY, JSON.stringify(list));
+  window.P = list;
+  if(typeof renderSeriesTabs==='function') renderSeriesTabs();
+  if(typeof renderProducts==='function') renderProducts();
+  renderMasterManager();
+}
+function escCsv(v){
+  return String(v??'').replace(/"/g,'""');
+}
+function renderMasterManager(){
+  const list=getMaster();
+  const count=document.getElementById('masterCount');
+  const box=document.getElementById('masterList');
+  if(!count||!box) return;
+  count.textContent=`登録 ${list.length}件`;
+  box.innerHTML=list.map((x,i)=>{
+    const maker=x[0]??'', series=x[1]??'', name=x[2]??'', code=x[3]??'', price=x[4]??0;
+    return `<div class="master-row">
+      <div><b>${esc(name)}</b><div class="master-meta">${esc(code)} ／ ${esc(maker)} ／ ${esc(series)} ／ 定価 ¥${Number(price||0).toLocaleString()}</div></div>
+      <div class="master-actions">
+        <button type="button" onclick="editMaster(${i})">編集</button>
+        <button type="button" class="del" onclick="deleteMaster(${i})">削除</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openMasterEditor(index=-1){
+  masterEditIndex=index;
+  const list=getMaster();
+  const x=index>=0 ? list[index] : ['','','','',''];
+  document.getElementById('mMaker').value=x[0]??'';
+  document.getElementById('mSeries').value=x[1]??'';
+  document.getElementById('mName').value=x[2]??'';
+  document.getElementById('mCode').value=x[3]??'';
+  document.getElementById('mPrice').value=x[4]??'';
+  document.getElementById('masterEditor').classList.add('open');
+  document.getElementById('mName').focus();
+}
+function closeMasterEditor(){
+  masterEditIndex=-1;
+  document.getElementById('masterEditor').classList.remove('open');
+}
+window.editMaster=i=>openMasterEditor(i);
+window.deleteMaster=i=>{
+  const list=getMaster();
+  const x=list[i];
+  if(!x) return;
+  if(!confirm(`${x[2]||x[3]||'この商品'}を削除しますか？`)) return;
+  list.splice(i,1);
+  saveMasterData(list);
+};
+function saveMasterForm(){
+  const maker=document.getElementById('mMaker').value.trim();
+  const series=document.getElementById('mSeries').value.trim();
+  const name=document.getElementById('mName').value.trim();
+  const code=document.getElementById('mCode').value.trim();
+  const price=Number(document.getElementById('mPrice').value||0);
+  if(!name || !code){
+    alert('商品名と型番は入力してください。');
+    return;
+  }
+  const list=getMaster();
+  const row=[maker,series,name,code,price];
+  if(masterEditIndex>=0) list[masterEditIndex]=row;
+  else list.push(row);
+  saveMasterData(list);
+  closeMasterEditor();
+}
+function exportMaster(){
+  const list=getMaster();
+  const blob=new Blob([JSON.stringify(list,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='J.style_商品マスター.json';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function importMasterFile(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      let list;
+      if(file.name.toLowerCase().endsWith('.csv')){
+        const lines=String(r.result).split(/\r?\n/).filter(Boolean);
+        list=lines.slice(1).map(line=>{
+          const a=[]; let cur='', q=false;
+          for(let i=0;i<line.length;i++){
+            const c=line[i];
+            if(c==='"' && line[i+1]==='"'){cur+='"';i++;continue}
+            if(c==='"'){q=!q;continue}
+            if(c===','&&!q){a.push(cur);cur='';}else cur+=c;
+          }
+          a.push(cur);
+          return [a[0]||'',a[1]||'',a[2]||'',a[3]||'',Number(a[4]||0)];
+        });
+      }else list=JSON.parse(r.result);
+      if(!Array.isArray(list)) throw new Error();
+      const normalized=list.map(x=>[x[0]||'',x[1]||'',x[2]||'',x[3]||'',Number(x[4]||0)]);
+      saveMasterData(normalized);
+      alert(`${normalized.length}件を読み込みました。`);
+    }catch(e){alert('マスターの読み込みに失敗しました。');}
+  };
+  r.readAsText(file,'utf-8');
+}
+function bindMasterManager(){
+  document.getElementById('addMasterBtn')?.addEventListener('click',()=>openMasterEditor());
+  document.getElementById('saveMasterBtn')?.addEventListener('click',saveMasterForm);
+  document.getElementById('cancelMasterBtn')?.addEventListener('click',closeMasterEditor);
+  document.getElementById('exportMasterBtn')?.addEventListener('click',exportMaster);
+  document.getElementById('importMasterBtn')?.addEventListener('click',()=>document.getElementById('masterFileInput')?.click());
+  document.getElementById('masterFileInput')?.addEventListener('change',e=>{
+    const f=e.target.files?.[0]; if(f) importMasterFile(f); e.target.value='';
+  });
+  renderMasterManager();
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  window.P=getMaster();
+  bindMasterManager();
+  if(typeof init==='function') init();
+});
+
+</script></body></html>
