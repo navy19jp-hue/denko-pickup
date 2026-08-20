@@ -3,116 +3,338 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
 <title>株式会社J.style 拾い出しアプリ</title>
 <style>
-*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;margin:0;background:#f5f7f9;color:#17202a}header{background:#111827;color:#fff;padding:18px 20px;position:sticky;top:0;z-index:10}header h1{font-size:22px;margin:0 0 5px}header p{margin:0;opacity:.78;font-size:13px}main{max-width:1180px;margin:auto;padding:16px}.card{background:#fff;border:1px solid #dbe1e8;border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px #0000000a}h2{font-size:19px;margin:0 0 12px}.drop{border:2px dashed #aeb9c6;border-radius:12px;padding:28px;text-align:center;background:#fafcff}.filepick{display:inline-block;background:#fff;border:1px solid #cbd5df;border-radius:10px;padding:10px 14px;font-weight:700}input,select{padding:10px;border:1px solid #cbd5df;border-radius:9px;font-size:14px;width:100%}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}button{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;background:#1976d2;color:#fff}button.secondary{background:#e8edf3;color:#26323d}button.green{background:#238636}button:disabled{opacity:.55;cursor:not-allowed}.actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.status{font-size:13px;color:#52606d;margin-top:9px;line-height:1.6}.progress{height:10px;background:#e8edf3;border-radius:99px;overflow:hidden;margin-top:10px}.bar{height:100%;width:0;background:#238636;transition:width .2s}.notice{padding:10px;border-radius:10px;background:#eef7ff;color:#174a7a;font-size:13px;margin-top:10px}.ok{background:#eaf8ef;color:#176b35}.error{background:#fff0f0;color:#9b1c1c}.tablewrap{overflow:auto}table{width:100%;min-width:1080px;border-collapse:collapse;font-size:13px}th,td{padding:7px;border-bottom:1px solid #e6e9ed;text-align:left;vertical-align:middle}th{background:#f1f4f7;position:sticky;top:72px;z-index:2}td input{min-width:85px}.badge{display:inline-block;padding:4px 7px;border-radius:99px;background:#fff3cd;color:#765600;font-size:11px;font-weight:700}.total{font-size:20px;font-weight:800;text-align:right;margin-top:12px}.small{font-size:12px;color:#687684}.busy{display:none;margin-left:4px}.busy.show{display:inline}.danger{color:#a61b1b}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}.metric{background:#f7f9fb;border-radius:10px;padding:10px}.metric b{display:block;font-size:18px;margin-top:4px}@media(max-width:750px){main{padding:10px}.grid,.summary{grid-template-columns:1fr 1fr}header h1{font-size:19px}.drop{padding:20px 10px}}
+:root{
+  --bg:#080d18;--panel:#101725;--panel2:#0c1320;--line:#202b3d;
+  --text:#f4f7fb;--muted:#8f9caf;--accent:#ff7540;--accent2:#ff925f;
+  --green:#36c98b;--danger:#ff5d6c;--shadow:0 12px 30px rgba(0,0,0,.28)
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#070c16,#0a101c);color:var(--text);
+font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;min-height:100vh}
+button,input,select{font:inherit}
+button{border:0;color:var(--text);cursor:pointer}
+.app{max-width:520px;margin:auto;min-height:100vh;padding-bottom:88px}
+header{position:sticky;top:0;z-index:20;background:rgba(8,13,24,.94);backdrop-filter:blur(14px);
+border-bottom:1px solid var(--line);padding:14px 16px 12px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.back{background:#111a29;border:1px solid var(--line);border-radius:22px;padding:9px 14px}
+.title{font-weight:800;font-size:17px;text-align:center;flex:1;white-space:nowrap}
+.fav{background:#111a29;border:1px solid var(--line);border-radius:22px;padding:9px 12px}
+main{padding:14px}
+.screen{display:none}.screen.active{display:block}
+.kicker{color:var(--accent2);font-size:12px;font-weight:800;letter-spacing:.08em;margin:4px 0 8px}
+h1{font-size:25px;margin:0 0 8px;line-height:1.25}h2{font-size:19px;margin:0 0 12px}
+p{color:var(--muted);line-height:1.6;margin:7px 0}
+.card{background:linear-gradient(180deg,#111827,#0e1623);border:1px solid var(--line);border-radius:18px;
+padding:15px;margin:12px 0;box-shadow:var(--shadow)}
+.label{font-size:11px;color:var(--muted);margin:0 0 7px}
+.input,select{width:100%;background:#090f1a;color:var(--text);border:1px solid var(--line);
+border-radius:12px;padding:13px 12px;outline:none}
+.input:focus,select:focus{border-color:var(--accent)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;background:#111a29;border:1px solid var(--line);border-radius:13px;padding:13px 12px;font-weight:800}
+.btn.primary{background:linear-gradient(180deg,#ff8050,#f46332);border-color:#ff925f}
+.btn.green{background:#17352c;border-color:#285f4e;color:#9ff0cf}
+.btn.small{width:auto;padding:10px 12px}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice{min-height:58px;background:#111a29;border:1px solid var(--line);border-radius:14px;padding:13px;font-weight:800}
+.choice.active{background:rgba(255,117,64,.24);border:2px solid var(--accent);color:#ff9a6e}
+.pill{display:inline-flex;align-items:center;background:#151e2d;border:1px solid var(--line);
+border-radius:999px;padding:6px 9px;font-size:11px;color:#b8c3d3;margin:2px}
+.hero{padding:22px 4px 10px}
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.home-tile{background:linear-gradient(180deg,#121c2b,#0d1522);border:1px solid var(--line);
+border-radius:18px;padding:18px 14px;min-height:125px;text-align:left}
+.home-tile .ico{font-size:27px;margin-bottom:14px}.home-tile b{display:block;font-size:16px}.home-tile span{color:var(--muted);font-size:11px}
+.project-list{display:grid;gap:9px}.project-item{display:flex;align-items:center;justify-content:space-between;
+gap:10px;background:#0c1420;border:1px solid var(--line);border-radius:14px;padding:13px}
+.project-item b{display:block}.project-item span{font-size:11px;color:var(--muted)}
+.stepbar{display:flex;gap:6px;margin:12px 0}.step{flex:1;height:5px;background:#1a2434;border-radius:9px}.step.active{background:var(--accent)}
+.qty{display:flex;align-items:center;gap:8px;justify-content:center}.qty button{width:42px;height:42px;border-radius:12px;background:#0a111d;border:1px solid var(--line);font-size:22px}
+.qty .num{width:58px;text-align:center;background:#0a111d;border:1px solid var(--line);border-radius:12px;padding:11px;font-weight:900}
+.unit-card{border-left:4px solid var(--accent);padding:13px;background:#0d1522;border-radius:14px;margin-top:12px}
+.unit-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.unit-head small{color:var(--muted)}.close{background:none;color:#8995a7;font-size:20px}
+.material{background:#0d1522;border:1px solid var(--line);border-radius:13px;padding:12px;margin:8px 0}
+.material .mrow{display:flex;justify-content:space-between;gap:10px}.material b{font-size:13px}.code{color:var(--accent2);font-weight:800;font-size:12px}
+.empty{padding:28px 12px;text-align:center;color:var(--muted);background:#090f18;border-radius:14px}
+.footer-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);
+display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+background:rgba(7,12,22,.96);border-top:1px solid var(--line);backdrop-filter:blur(12px);z-index:30}
+.navbtn{background:transparent;color:#8390a3;padding:7px 3px;border-radius:10px;font-size:10px}.navbtn.active{color:#fff;background:#131d2c}
+.total{display:flex;justify-content:space-between;align-items:end;padding-top:10px;border-top:1px solid var(--line);margin-top:10px}
+.total b{font-size:24px;color:#fff}.muted{color:var(--muted);font-size:11px}
+.toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);background:#172235;border:1px solid #2b3a51;
+padding:11px 15px;border-radius:999px;z-index:50;display:none;font-size:12px}
+.search{margin-bottom:10px}
+@media(min-width:700px){body{padding:20px}.app{border:1px solid var(--line);border-radius:24px;overflow:hidden;background:#080d18}.footer-nav{position:absolute}}
 </style>
-<!-- GitHub Pagesで安定しやすいUMD版。module importは使わない -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
-<header><h1>株式会社J.style 拾い出しアプリ</h1><p>図面PDF・画像 → 電気設備拾い出し → 見積データ</p></header>
+<div class="app">
+<header>
+  <div class="top">
+    <button class="back" id="backBtn">‹ 戻る</button>
+    <div class="title">株式会社J.style 拾い出し</div>
+    <button class="fav" id="favBtn">☆ お気に入り</button>
+  </div>
+</header>
+
 <main>
-<section class="card">
-<h2>① 図面アップロード</h2>
-<div class="drop">
-  <div style="font-size:18px;font-weight:800;margin-bottom:10px">PDFまたは画像を選択</div>
-  <label class="filepick">ファイルを選択 <input id="file" type="file" accept=".pdf,image/*" hidden></label>
-  <div class="small" style="margin-top:10px">PDF / JPG / PNG / WEBP</div>
-</div>
-<div class="status" id="fileStatus">ファイル未選択</div>
-<div class="progress"><div class="bar" id="bar"></div></div>
-<div class="notice" id="notice">図面を選択しただけでは解析しません。「図面を解析する」を押した時に解析を開始します。</div>
+<section id="home" class="screen active">
+  <div class="hero">
+    <div class="kicker">J.STYLE ELECTRICAL PICKUP</div>
+    <h1>配線器具を<br>すばやく拾い出し</h1>
+    <p>図面を見ながら、メーカー・シリーズ・プレート・器具を選択。数量を入れるだけで材料リストを自動集計します。</p>
+  </div>
+  <div class="home-grid">
+    <button class="home-tile" onclick="startProject()"><div class="ico">＋</div><b>新しい拾い出し</b><span>現場を作成して開始</span></button>
+    <button class="home-tile" onclick="show('materials')"><div class="ico">▤</div><b>材料リスト</b><span>型番付きで確認</span></button>
+    <button class="home-tile" onclick="show('master')"><div class="ico">⌕</div><b>商品マスター</b><span>メーカー・型番を登録</span></button>
+    <button class="home-tile" onclick="show('settings')"><div class="ico">⚙</div><b>設定</b><span>掛率・保存データ</span></button>
+  </div>
+  <div class="card">
+    <h2>最近の現場</h2>
+    <div id="recent" class="project-list"></div>
+  </div>
 </section>
-<section class="card">
-<h2>② 案件情報</h2>
-<div class="grid">
-<input id="project" placeholder="案件名"><input id="customer" placeholder="施主・客先"><input id="site" placeholder="施工場所"><input id="drawing" placeholder="図面名称">
-</div>
+
+<section id="create" class="screen">
+  <div class="stepbar"><i class="step active"></i><i class="step"></i><i class="step"></i><i class="step"></i></div>
+  <div class="card">
+    <div class="kicker">現場</div><h2>新しい拾い出し</h2>
+    <label class="label">現場名</label><input id="siteName" class="input" placeholder="例：富山新築住宅">
+    <div style="height:10px"></div>
+    <label class="label">メーカー</label>
+    <div class="choice-grid" id="makerChoices">
+      <button class="choice active" data-maker="Panasonic">Panasonic</button>
+      <button class="choice" data-maker="神保電器">神保電器</button>
+      <button class="choice" data-maker="東芝ライテック">東芝ライテック</button>
+      <button class="choice" data-maker="その他">その他</button>
+    </div>
+    <div style="height:12px"></div>
+    <label class="label">シリーズ</label>
+    <div class="choice-grid" id="seriesChoices">
+      <button class="choice active" data-series="コスモシリーズワイド21">コスモシリーズワイド21</button>
+      <button class="choice" data-series="アドバンスシリーズ">アドバンスシリーズ</button>
+    </div>
+    <div style="height:12px"></div>
+    <button class="choice active" id="familyBtn" style="width:100%">フルカラー配線器具</button>
+    <div style="height:12px"></div>
+    <button class="btn primary" onclick="createProject()">作成する</button>
+  </div>
 </section>
-<section class="card">
-<h2>③ 拾い出し結果</h2>
-<p class="status">PDFは文字情報を読み取り、画像・スキャンPDFはOCRで文字を読み取って候補を作ります。数量は図面と照合して確定してください。</p>
-<div class="actions"><button id="add">項目追加</button><button class="green" id="analyze">図面を解析する <span id="busy" class="busy">●</span></button><button class="secondary" id="export">JSON出力</button><button class="secondary" id="csv">CSV出力</button></div>
-<div class="summary"><div class="metric">読み取りページ<b id="pages">0</b></div><div class="metric">候補種類<b id="kinds">0</b></div><div class="metric">候補数量<b id="qty">0</b></div><div class="metric">要確認<b id="checks">0</b></div></div>
-<div class="tablewrap" style="margin-top:12px"><table id="tbl"><thead><tr><th>区分</th><th>記号</th><th>品名</th><th>仕様</th><th>数量</th><th>単位</th><th>メーカー</th><th>型番/品番</th><th>定価</th><th>状態</th></tr></thead><tbody></tbody></table></div>
+
+<section id="room" class="screen">
+  <div class="stepbar"><i class="step active"></i><i class="step active"></i><i class="step"></i><i class="step"></i></div>
+  <div class="card">
+    <div class="kicker">部屋・回路</div><h2 id="roomTitle">1</h2>
+    <label class="label">器具構成</label>
+    <p>器具構成ごとにプレートを1枚の単位で拾います。スイッチの個口数は器具ごとに選択できます。</p>
+    <div class="label">プレート</div>
+    <div class="choice-grid" id="plateChoices">
+      <button class="choice active" data-plate="モダン">モダン</button>
+      <button class="choice" data-plate="新金属">新金属</button>
+      <button class="choice" data-plate="防滴（屋外）">防滴（屋外）</button>
+      <button class="choice" data-plate="ガード（カギ付）">ガード（カギ付）</button>
+    </div>
+    <div id="units"></div>
+    <button class="btn" style="margin-top:10px" onclick="addUnit()">＋ 器具を追加</button>
+    <div class="label" style="margin-top:15px">取付枠</div>
+    <div class="choice-grid">
+      <button class="choice" data-frame="金属" onclick="selectFrame(this)">金属</button>
+      <button class="choice active" data-frame="絶縁" onclick="selectFrame(this)">絶縁</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>この部屋の集計</h2>
+    <div id="roomSummary" class="empty">器具を追加すると自動集計されます</div>
+  </div>
+  <button class="btn primary" onclick="finishRoom()">材料リストを見る</button>
 </section>
-<section class="card"><h2>④ 見積集計</h2><div class="grid"><input id="material" type="number" placeholder="材料費"><input id="labor" type="number" placeholder="労務費"><input id="expense" type="number" placeholder="経費"><input id="tax" type="number" value="10" placeholder="消費税%"></div><div class="total" id="total">合計 0 円</div></section>
+
+<section id="materials" class="screen">
+  <div class="stepbar"><i class="step active"></i><i class="step active"></i><i class="step active"></i><i class="step active"></i></div>
+  <div class="kicker">型番付き材料リスト</div><h2>材料リスト</h2>
+  <div class="card">
+    <div class="mrow" style="display:flex;justify-content:space-between"><b id="materialHeader">1 / フルカラー配線器具</b><span class="pill" id="materialCount">0点</span></div>
+    <p>数量は集計結果と共通です。発注先ごとに並べて確認できます。</p>
+    <button class="btn" onclick="editMaterials()">材料リストを編集する</button>
+  </div>
+  <div id="materialList"></div>
+  <div class="card">
+    <div class="label">見積用集計</div>
+    <div class="row">
+      <div><div class="label">材料定価合計</div><input class="input" id="listTotal" readonly></div>
+      <div><div class="label">掛率</div><input class="input" id="rate" type="number" value="70" onchange="recalc()"></div>
+    </div>
+    <div class="total"><span>見積材料費</span><b id="estimateTotal">¥0</b></div>
+  </div>
+  <div class="row">
+    <button class="btn green" onclick="exportCSV()">CSV出力</button>
+    <button class="btn primary" onclick="window.print()">印刷 / PDF</button>
+  </div>
+</section>
+
+<section id="master" class="screen">
+  <div class="kicker">商品マスター</div><h2>メーカー・型番</h2>
+  <input id="masterSearch" class="input search" placeholder="商品名・型番で検索" oninput="renderMaster()">
+  <div id="masterList"></div>
+  <div class="card">
+    <h2>商品を追加</h2>
+    <div class="row"><input id="mMaker" class="input" placeholder="メーカー"><input id="mCode" class="input" placeholder="型番/品番"></div>
+    <div style="height:8px"></div>
+    <input id="mName" class="input" placeholder="品名">
+    <div style="height:8px"></div>
+    <div class="row"><input id="mPrice" class="input" type="number" placeholder="定価"><input id="mUnit" class="input" placeholder="単位" value="個"></div>
+    <div style="height:8px"></div>
+    <button class="btn primary" onclick="addMaster()">マスターに登録</button>
+  </div>
+</section>
+
+<section id="settings" class="screen">
+  <div class="kicker">設定</div><h2>J.style設定</h2>
+  <div class="card">
+    <label class="label">標準材料掛率（%）</label><input class="input" id="defaultRate" type="number" value="70">
+    <div style="height:10px"></div>
+    <button class="btn primary" onclick="saveSettings()">保存する</button>
+  </div>
+  <div class="card"><h2>データ</h2><button class="btn" onclick="clearAll()">保存データを初期化</button></div>
+</section>
 </main>
+
+<nav class="footer-nav">
+  <button class="navbtn active" data-nav="home" onclick="show('home')">⌂<br>ホーム</button>
+  <button class="navbtn" data-nav="create" onclick="startProject()">＋<br>拾い出し</button>
+  <button class="navbtn" data-nav="materials" onclick="show('materials')">▤<br>材料</button>
+  <button class="navbtn" data-nav="master" onclick="show('master')">⌕<br>マスター</button>
+</nav>
+<div id="toast" class="toast"></div>
+
 <script>
-'use strict';
 const $=id=>document.getElementById(id);
-const fileEl=$('file'), statusEl=$('fileStatus'), bar=$('bar'), notice=$('notice'), tbody=document.querySelector('#tbl tbody');
-const analyzeBtn=$('analyze'), busy=$('busy');
-const patterns=[
- {re:/直付けシーリング|シーリング/,cat:'照明',sym:'CL',name:'直付けシーリング',unit:'個'},
- {re:/ダウンライト/,cat:'照明',sym:'DL',name:'ダウンライト',unit:'個'},
- {re:/ペンダント/,cat:'照明',sym:'P',name:'ペンダント',unit:'個'},
- {re:/スポットライト/,cat:'照明',sym:'SP',name:'スポットライト',unit:'個'},
- {re:/引っ掛けシーリング|引掛シーリング/,cat:'照明',sym:'CS',name:'引っ掛けシーリング',unit:'個'},
- {re:/4路|四路/,cat:'スイッチ',sym:'4',name:'4路スイッチ',unit:'個'},
- {re:/3路|三路/,cat:'スイッチ',sym:'3',name:'3路スイッチ',unit:'個'},
- {re:/調光器/,cat:'スイッチ',sym:'調光',name:'調光器',unit:'個'},
- {re:/スイッチ/,cat:'スイッチ',sym:'',name:'スイッチ',unit:'個'},
- {re:/3口壁付コンセント/,cat:'コンセント',sym:'3',name:'3口壁付コンセント',unit:'個'},
- {re:/2口壁付コンセント/,cat:'コンセント',sym:'2',name:'2口壁付コンセント',unit:'個'},
- {re:/2E/,cat:'コンセント',sym:'2E',name:'2口+アースコンセント',unit:'個'},
- {re:/1口\+アース|1口壁付コンセント/,cat:'コンセント',sym:'E',name:'1口+アース/1口壁付コンセント',unit:'個'},
- {re:/コンセント/,cat:'コンセント',sym:'',name:'コンセント',unit:'個'},
- {re:/TVコンセント|TV/,cat:'情報',sym:'TV',name:'TVコンセント',unit:'個'},
- {re:/LAN/,cat:'情報',sym:'LAN',name:'LAN',unit:'個'},
- {re:/TELコンセント|TEL/,cat:'情報',sym:'TEL',name:'TELコンセント',unit:'個'},
- {re:/インターホン親機/,cat:'インターホン',sym:'親',name:'インターホン親機',unit:'台'},
- {re:/インターホン子機/,cat:'インターホン',sym:'子',name:'インターホン子機',unit:'台'},
- {re:/エアコン用コンセント100V|AC100V/,cat:'空調',sym:'AC100V',name:'エアコン用コンセント100V',unit:'個'},
- {re:/エアコン用コンセント200V|AC200V/,cat:'空調',sym:'AC200V',name:'エアコン用コンセント200V',unit:'個'},
- {re:/天井換気扇/,cat:'換気',sym:'',name:'天井換気扇',unit:'台'},
- {re:/換気扇/,cat:'換気',sym:'',name:'換気扇',unit:'台'},
- {re:/分電盤/,cat:'盤',sym:'',name:'分電盤',unit:'面'},
- {re:/熱感知器/,cat:'防災',sym:'熱',name:'熱感知器',unit:'個'},
- {re:/煙感知器/,cat:'防災',sym:'煙',name:'煙感知器',unit:'個'}
+const KEY='jstyle_pickup_v2';
+const baseMaster=[
+ {maker:'Panasonic',code:'WN5001010',name:'片切スイッチ',price:0,unit:'個'},
+ {maker:'Panasonic',code:'WN5002010',name:'3路スイッチ',price:0,unit:'個'},
+ {maker:'Panasonic',code:'WN5012',name:'4路スイッチ',price:0,unit:'個'},
+ {maker:'Panasonic',code:'WN1512',name:'接地付ダブルコンセント',price:0,unit:'個'},
+ {maker:'Panasonic',code:'WN3710020',name:'取付枠（絶縁・ワンタッチ）',price:0,unit:'枚'},
+ {maker:'Panasonic',code:'WN6003W010',name:'プレート（モダンプレート・1連・3コ用）',price:0,unit:'枚'},
+ {maker:'Panasonic',code:'WN6072W',name:'プレート（モダンプレート・2連・2コ用）',price:0,unit:'枚'}
 ];
-function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function addRow(v=['','','','','1','個','','','']){
- const tr=document.createElement('tr');
- const widths=[95,80,180,150,75,65,100,130,90];
- for(let i=0;i<9;i++){const td=document.createElement('td');const inp=document.createElement('input');inp.value=v[i]??'';inp.style.width=widths[i]+'px';if(i===8)inp.type='number';td.appendChild(inp);tr.appendChild(td)}
- const td=document.createElement('td');td.innerHTML='<span class="badge">要確認</span>';tr.appendChild(td);tbody.appendChild(tr);return tr;
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||{master:baseMaster,projects:[],settings:{rate:70},current:null};
+let current=data.current;
+
+function save(){data.current=current;localStorage.setItem(KEY,JSON.stringify(data))}
+function toast(s){const t=$('toast');t.textContent=s;t.style.display='block';clearTimeout(window._tt);window._tt=setTimeout(()=>t.style.display='none',1800)}
+function show(id){
+ document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+ $(id).classList.add('active');
+ document.querySelectorAll('.navbtn').forEach(x=>x.classList.toggle('active',x.dataset.nav===id));
+ if(id==='home')renderRecent();
+ if(id==='materials')renderMaterials();
+ if(id==='master')renderMaster();
+ if(id==='settings')$('defaultRate').value=data.settings.rate;
+ window.scrollTo({top:0,behavior:'smooth'});
 }
-function clearRows(){tbody.innerHTML=''}
-function setProgress(n,msg,kind){bar.style.width=n+'%';statusEl.textContent=msg;notice.className='notice '+(kind||'');}
-function updateSummary(){let q=0;[...tbody.querySelectorAll('tr')].forEach(tr=>{q+=Number(tr.querySelectorAll('input')[4]?.value)||0});$('qty').textContent=q;$('kinds').textContent=tbody.rows.length;$('checks').textContent=tbody.rows.length}
-function countText(text){const results=[];for(const p of patterns){const m=text.match(new RegExp(p.re.source,p.re.flags.includes('g')?'g':'gi'));if(m&&m.length)results.push({...p,count:m.length})}return results}
-async function extractPdf(file){
- const buf=await file.arrayBuffer();
- if(!window.pdfjsLib)throw new Error('PDF解析ライブラリを読み込めませんでした。通信環境またはGitHub Pagesの外部スクリプト読み込みを確認してください。');
- pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
- const pdf=await pdfjsLib.getDocument({data:buf}).promise;let text='';
- for(let p=1;p<=pdf.numPages;p++){setProgress(Math.round((p/pdf.numPages)*55),`PDF解析中… ${p}/${pdf.numPages}ページ`);const page=await pdf.getPage(p);const tc=await page.getTextContent();text+='\n'+tc.items.map(x=>x.str).join(' ')}
- return {text,pages:pdf.numPages};
+function startProject(){current={site:'',maker:'Panasonic',series:'コスモシリーズワイド21',family:'フルカラー配線器具',plate:'モダン',frame:'絶縁',units:[],materials:{},created:Date.now()};show('create')}
+function bindChoices(containerId,prop){
+ document.querySelectorAll('#'+containerId+' .choice').forEach(b=>b.onclick=()=>{document.querySelectorAll('#'+containerId+' .choice').forEach(x=>x.classList.remove('active'));b.classList.add('active');current[prop]=b.dataset[prop]});
 }
-async function extractImage(file){
- if(!window.Tesseract)throw new Error('OCRライブラリを読み込めませんでした。通信環境を確認してください。');
- setProgress(10,'画像OCRを準備中…');const worker=await Tesseract.createWorker('jpn');setProgress(30,'画像をOCR解析中…');const r=await worker.recognize(file);await worker.terminate();return {text:r.data.text,pages:1};
+bindChoices('makerChoices','maker');bindChoices('seriesChoices','series');bindChoices('plateChoices','plate');
+$('familyBtn').onclick=()=>{current.family=current.family==='フルカラー配線器具'?'フルカラー配線器具':'フルカラー配線器具';toast('フルカラー配線器具を選択中')}
+
+function createProject(){current.site=$('siteName').value.trim()||'名称未設定';save();show('room');renderRoom();toast('現場を作成しました')}
+function selectFrame(btn){document.querySelectorAll('[data-frame]').forEach(x=>x.classList.remove('active'));btn.classList.add('active');current.frame=btn.dataset.frame;save();renderMaterials()}
+function addUnit(){current.units.push({qty:1,type:'',code:'',name:'',unit:'個'});save();renderRoom()}
+function removeUnit(i){current.units.splice(i,1);save();renderRoom()}
+function changeQty(i,d){current.units[i].qty=Math.max(1,(current.units[i].qty||1)+d);save();renderRoom()}
+function setType(i,t){current.units[i].type=t; if(t==='スイッチ'){current.units[i].name='片切スイッチ';current.units[i].code='WN5001010'}
+ if(t==='コンセント'){current.units[i].name='接地付ダブルコンセント';current.units[i].code='WN1512'}
+ if(t==='その他／弱電'){current.units[i].name='その他／弱電';current.units[i].code='';} save();renderRoom()}
+function renderRoom(){
+ $('roomTitle').textContent=current.site+' / 1';
+ const wrap=$('units');wrap.innerHTML='';
+ if(!current.units.length){wrap.innerHTML='<div class="empty" style="margin-top:10px">「＋ 器具を追加」から器具を追加してください</div>'}
+ current.units.forEach((u,i)=>{
+   const d=document.createElement('div');d.className='unit-card';
+   d.innerHTML=`<div class="unit-head"><div><b>器具 ${i+1}・1連</b><br><small>数量を選んでから、器具の種類を選択</small></div><button class="close" onclick="removeUnit(${i})">×</button></div>
+   <div class="label">数量</div><div class="qty"><button onclick="changeQty(${i},-1)">−</button><div class="num">${u.qty}</div><button onclick="changeQty(${i},1)">＋</button><span class="muted">セット</span></div>
+   <div class="choice-grid" style="margin-top:12px">
+    <button class="choice ${u.type==='スイッチ'?'active':''}" onclick="setType(${i},'スイッチ')">スイッチ</button>
+    <button class="choice ${u.type==='コンセント'?'active':''}" onclick="setType(${i},'コンセント')">コンセント</button>
+   </div>
+   <button class="choice ${u.type==='その他／弱電'?'active':''}" style="width:100%;margin-top:10px" onclick="setType(${i},'その他／弱電')">その他／弱電</button>`;
+   wrap.appendChild(d)
+ })
+ renderRoomSummary()
 }
-fileEl.addEventListener('change',()=>{const f=fileEl.files[0];if(!f){statusEl.textContent='ファイル未選択';return}$('drawing').value=f.name;setProgress(0,`選択: ${f.name}（${Math.round(f.size/1024)} KB）`,'ok');notice.textContent='アップロード完了。まだ解析は実行していません。下の「図面を解析する」を押してください。';});
-$('add').onclick=()=>{addRow();updateSummary()};
-analyzeBtn.onclick=async()=>{
- const f=fileEl.files[0];if(!f){alert('先に図面PDFまたは画像を選択してください。');return}
- analyzeBtn.disabled=true;busy.classList.add('show');clearRows();setProgress(3,'解析を開始しています…');
- try{
-  const result=f.type==='application/pdf'?await extractPdf(f):await extractImage(f);setProgress(70,'電気設備の記号・名称を集計中…');
-  const hits=countText(result.text);if(!hits.length){addRow(['その他','','解析候補（要確認）','PDF/画像から候補を検出できませんでした','1','式'])}else hits.forEach(h=>addRow([h.cat,h.sym,h.name,'',h.count,h.unit]));
-  $('pages').textContent=result.pages;updateSummary();setProgress(100,`解析完了：${result.pages}ページ／${hits.length}種類の候補。数量は図面と照合してください。`,'ok');
- }catch(e){console.error(e);setProgress(0,'解析に失敗しました。下記エラーを確認してください。','error');alert('解析エラー\n'+(e?.message||e));}
- finally{analyzeBtn.disabled=false;busy.classList.remove('show')}
-};
-['material','labor','expense','tax'].forEach(id=>$(id).addEventListener('input',()=>{const m=+$('material').value||0,l=+$('labor').value||0,e=+$('expense').value||0,t=+$('tax').value||0;$('total').textContent=`合計 ${Math.round((m+l+e)*(1+t/100)).toLocaleString()} 円`}));
-function getRows(){return [...tbody.querySelectorAll('tr')].map(tr=>{const a=[...tr.querySelectorAll('input')].map(x=>x.value);return{category:a[0],symbol:a[1],item_name:a[2],specification:a[3],quantity:Number(a[4])||0,unit:a[5],manufacturer:a[6],model_number:a[7],list_price:Number(a[8])||0,status:'needs_verification'}})}
-function download(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
-$('export').onclick=()=>download('jstyle_pickup_result.json',new Blob([JSON.stringify({app:'株式会社J.style 拾い出しアプリ',version:'5.0',project:{name:$('project').value,customer:$('customer').value,site:$('site').value,drawing:$('drawing').value},items:getRows()},null,2)],{type:'application/json'}));
-$('csv').onclick=()=>{const rows=getRows();const head=['区分','記号','品名','仕様','数量','単位','メーカー','型番/品番','定価','状態'];const body=rows.map(r=>[r.category,r.symbol,r.item_name,r.specification,r.quantity,r.unit,r.manufacturer,r.model_number,r.list_price,r.status]);const csv='\ufeff'+[head,...body].map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\n');download('jstyle_pickup_result.csv',new Blob([csv],{type:'text/csv;charset=utf-8'}))};
-updateSummary();
+function renderRoomSummary(){
+ const list=current.units.filter(x=>x.type);
+ $('roomSummary').innerHTML=list.length?list.map(x=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)"><span>${x.type} / ${x.name}</span><b>${x.qty}</b></div>`).join(''):'器具を追加すると自動集計されます';
+}
+function finishRoom(){
+ buildMaterials();save();show('materials');renderMaterials();toast('材料リストを作成しました')
+}
+function buildMaterials(){
+ const m={};
+ function add(code,name,maker,qty,unit,price=0){if(!qty)return;const k=maker+'|'+code+'|'+name;if(!m[k])m[k]={maker,code,name,qty:0,unit,price};m[k].qty+=qty}
+ current.units.forEach(u=>{
+  if(u.type==='スイッチ')add(u.code||'WN5001010',u.name||'片切スイッチ',current.maker,u.qty,'個');
+  if(u.type==='コンセント')add(u.code||'WN1512',u.name||'接地付ダブルコンセント',current.maker,u.qty,'個');
+ });
+ // 取付枠とプレートは器具数に応じて自動集計
+ const totalUnits=current.units.reduce((a,b)=>a+(+b.qty||0),0);
+ if(totalUnits){
+  const frameCode=current.frame==='絶縁'?'WN3710020':'WN3700020';
+  add(frameCode,current.frame==='絶縁'?'取付枠（絶縁・ワンタッチ）':'取付枠（金属）',current.maker,totalUnits,'枚');
+  const plateCode=current.plate==='モダン'?'WN6003W010':'';
+  add(plateCode,current.plate==='モダン'?'プレート（モダンプレート・1連・3コ用）':`プレート（${current.plate}）`,current.maker,totalUnits,'枚');
+ }
+ current.materials=m;
+}
+function renderMaterials(){
+ if(!current){$('materialHeader').textContent='現場未作成';$('materialList').innerHTML='<div class="empty">「拾い出し」から現場を作成してください</div>';return}
+ buildMaterials();
+ const arr=Object.values(current.materials);
+ $('materialHeader').textContent=`${current.site} / フルカラー配線器具`;
+ $('materialCount').textContent=arr.reduce((a,x)=>a+x.qty,0)+'点';
+ $('materialList').innerHTML=arr.length?arr.map(x=>`<div class="material"><div class="mrow"><div><b>${x.name}</b><div class="code">${x.code||'型番未設定'}</div><span class="muted">${x.maker}</span></div><b>${x.qty}${x.unit}</b></div></div>`).join(''):'<div class="empty">まだ材料がありません</div>';
+ const total=arr.reduce((a,x)=>a+(+x.price||0)*(+x.qty||0),0);
+ $('listTotal').value='¥'+total.toLocaleString();recalc();
+}
+function recalc(){const rate=+$('rate').value||0;const total=Object.values(current?.materials||{}).reduce((a,x)=>a+(+x.price||0)*(+x.qty||0),0);$('estimateTotal').textContent='¥'+Math.round(total*rate/100).toLocaleString()}
+function editMaterials(){show('master');toast('マスターから型番・定価を登録できます')}
+function renderMaster(){
+ const q=($('masterSearch').value||'').toLowerCase();
+ const arr=data.master.filter(x=>(x.name+x.code+x.maker).toLowerCase().includes(q));
+ $('masterList').innerHTML=arr.map((x,i)=>`<div class="material"><div class="mrow"><div><b>${x.name}</b><div class="code">${x.code}</div><span class="muted">${x.maker} / 定価 ¥${(+x.price||0).toLocaleString()} / ${x.unit}</span></div><button class="btn small" onclick="useMaster(${i})">使う</button></div></div>`).join('')||'<div class="empty">該当する商品がありません</div>';
+}
+function useMaster(i){const x=data.master[i]; if(!current){startProject()} current.units.push({qty:1,type:x.name.includes('スイッチ')?'スイッチ':x.name.includes('コンセント')?'コンセント':'その他／弱電',code:x.code,name:x.name,unit:x.unit});save();show('room');renderRoom();toast('器具を追加しました')}
+function addMaster(){
+ const x={maker:$('mMaker').value.trim()||'未設定',code:$('mCode').value.trim(),name:$('mName').value.trim()||'未設定',price:+$('mPrice').value||0,unit:$('mUnit').value.trim()||'個'};
+ data.master.push(x);save();['mMaker','mCode','mName','mPrice'].forEach(id=>$(id).value='');renderMaster();toast('商品を登録しました')
+}
+function renderRecent(){
+ $('recent').innerHTML=data.projects.length?data.projects.slice(-5).reverse().map((p,i)=>`<button class="project-item" onclick="loadProject(${data.projects.length-1-i})"><div><b>${p.site}</b><span>${new Date(p.created).toLocaleDateString('ja-JP')}</span></div><span>›</span></button>`).join(''):'<div class="empty">まだ現場がありません</div>'
+}
+function loadProject(i){current=data.projects[i];save();show('materials');renderMaterials()}
+function exportCSV(){
+ const arr=Object.values(current?.materials||{});let csv='メーカー,型番/品番,品名,数量,単位,定価\\n';
+ arr.forEach(x=>csv+=`"${x.maker}","${x.code}","${x.name}",${x.qty},"${x.unit}",${x.price||0}\\n`);
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\\ufeff'+csv],{type:'text/csv'}));a.download=(current?.site||'Jstyle_拾い出し')+'.csv';a.click();
+}
+function saveSettings(){data.settings.rate=+$('defaultRate').value||70;save();toast('設定を保存しました')}
+function clearAll(){if(confirm('保存した現場・マスターを初期化しますか？')){localStorage.removeItem(KEY);location.reload()}}
+$('backBtn').onclick=()=>show('home');
+$('favBtn').onclick=()=>toast('お気に入り登録は次版で拡張できます');
+window.addEventListener('beforeunload',save);
+renderRecent();renderMaster();
 </script>
-</body></html>
+</div>
+</body>
+</html>
