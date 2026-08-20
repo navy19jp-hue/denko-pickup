@@ -2,96 +2,209 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
 <title>電工拾い出し</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;background:#f4f6f8;color:#202733}
-header{background:#111827;color:white;padding:18px 20px;position:sticky;top:0;z-index:10}h1{margin:0;font-size:23px}header p{margin:5px 0 0;color:#cbd5e1;font-size:13px}
-main{max-width:1100px;margin:auto;padding:16px}.card{background:white;border:1px solid #dce2e8;border-radius:12px;padding:17px;margin-bottom:15px}h2{font-size:18px;margin:0 0 14px;border-left:4px solid #1769e0;padding-left:9px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.field label{display:block;font-size:12px;color:#667085;margin-bottom:5px}.field input{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:15px}
-.upload{border:2px dashed #b8c4d2;border-radius:12px;padding:22px;text-align:center;background:#f8fafc}.upload input{display:none}.upload label{display:inline-block;background:#1769e0;color:white;padding:11px 18px;border-radius:8px;font-weight:700}.preview{margin-top:12px;text-align:center}.preview img{max-width:100%;max-height:400px}.preview iframe{width:100%;height:450px;border:1px solid #ddd}
-.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;border-radius:8px;padding:10px 14px;font-weight:700}.primary{background:#1769e0;color:white}.success{background:#198754;color:white}.gray{background:#e9eef4}.danger{background:#fee2e2;color:#b42318}
-.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:850px}th,td{border-bottom:1px solid #dce2e8;padding:7px}th{background:#f1f5f9;font-size:12px}td input{width:100%;padding:7px;border:1px solid #cbd5e1;border-radius:6px}.num{text-align:right}
-.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.box{background:#f8fafc;border:1px solid #dce2e8;border-radius:9px;padding:12px}.box small{display:block;color:#667085}.box strong{font-size:20px}.total{background:#e8f1ff;border-color:#9fc2ff}
-.note{font-size:12px;color:#667085;line-height:1.6}.tag{display:inline-block;background:#e8f1ff;color:#1458b8;border-radius:999px;padding:4px 8px;font-size:12px;margin:2px}
-footer{text-align:center;padding:25px;color:#667085;font-size:12px}
-@media(max-width:750px){.grid,.summary{grid-template-columns:1fr 1fr}}@media(max-width:480px){.grid,.summary{grid-template-columns:1fr}}
-@media print{header,.no-print,.upload,.preview{display:none!important}body{background:white}.card{border:0;box-shadow:none}}
+*{box-sizing:border-box}
+body{margin:0;background:#f3f4f6;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Noto Sans JP",Arial,sans-serif}
+header{background:#0f172a;color:#fff;padding:14px 16px;position:sticky;top:0;z-index:20}
+header h1{margin:0;font-size:20px} header p{margin:4px 0 0;font-size:12px;opacity:.75}
+main{max-width:1100px;margin:auto;padding:12px 12px 100px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:14px;margin-bottom:12px}
+h2{font-size:17px;margin:0 0 12px;border-left:4px solid #2563eb;padding-left:8px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.field label{display:block;font-size:12px;color:#64748b;margin-bottom:5px}
+input,select,button{font:inherit}
+input,select{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:10px;background:#fff}
+button{border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer}
+.primary{background:#0f172a;color:#fff}.blue{background:#2563eb;color:#fff}.green{background:#15803d;color:#fff}
+.gray{background:#eef2f7;color:#1f2937;border:1px solid #d7dee8}.danger{background:#fee2e2;color:#991b1b}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar>*{flex:1;min-width:120px}
+.tabs{display:flex;gap:7px;overflow:auto;padding-bottom:2px}.tab{white-space:nowrap;border:1px solid #cbd5e1;background:#fff}.tab.on{background:#0f172a;color:#fff}
+.badge{display:inline-block;background:#dcfce7;color:#166534;border-radius:999px;padding:4px 8px;font-size:11px}
+.grid-products{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.item{border:1px solid #e5e7eb;border-radius:13px;padding:10px}
+.item .name{font-weight:800;font-size:13px}.muted{color:#64748b;font-size:11px}.small{font-size:12px}
+.qtyrow{display:flex;align-items:center;gap:6px;margin-top:8px}.q{width:38px;height:38px;padding:0;background:#e5e7eb;font-size:20px}.qty{flex:1;text-align:center;font-weight:900}
+.notice{background:#f8fafc;border-radius:10px;padding:9px;font-size:12px;color:#475569;line-height:1.5}
+.plan{position:relative;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;background:#f8fafc}
+.plan canvas{display:block;width:100%;height:auto;touch-action:manipulation}
+.pin{position:absolute;transform:translate(-50%,-50%);width:31px;height:31px;border-radius:50%;background:#0f172a;color:#fff;border:2px solid #fff;padding:0;font-size:11px;z-index:3}
+.list{display:grid;grid-template-columns:minmax(0,1fr) 55px 100px 110px;gap:7px;padding:9px 0;border-bottom:1px solid #eef2f7;align-items:center}
+.list:last-child{border-bottom:0}.right{text-align:right}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:11px;padding:11px}.box small{display:block;color:#64748b}.box strong{font-size:19px}
+.box.total{background:#eff6ff;border-color:#93c5fd}.grand{font-size:28px;font-weight:900}
+table{border-collapse:collapse;width:100%;min-width:900px}th,td{border-bottom:1px solid #e5e7eb;padding:7px}th{background:#f8fafc;font-size:12px;text-align:left}td input{padding:7px}
+.tablewrap{overflow:auto}
+footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ddd;padding:8px 10px;z-index:30}
+.foot{max-width:1100px;margin:auto;display:flex;gap:7px}.foot button{flex:1}
+.hidden{display:none!important}
+.toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 14px;border-radius:999px;z-index:50;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}
+@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.grid-products{grid-template-columns:repeat(2,1fr)}.summary{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.grid{grid-template-columns:1fr}.grid-products{grid-template-columns:1fr 1fr}.list{grid-template-columns:1fr 48px 85px 95px}.grand{font-size:23px}}
+@media print{header,.no-print,footer,.upload,.toolbar,.tabs{display:none!important}body{background:#fff}.card{border:0;box-shadow:none}.plan{border:0}}
 </style>
 </head>
 <body>
-<header><h1>⚡ 電工拾い出し</h1><p>電気工事・空調工事の数量拾い出し／見積計算</p></header>
-<main>
+<header>
+  <h1>⚡ 電工拾い出し</h1>
+  <p>電気工事・空調工事の数量拾い出し／図面ピン打ち／材料集計</p>
+</header>
 
+<main>
 <section class="card">
 <h2>案件情報</h2>
 <div class="grid">
-<div class="field"><label>案件名</label><input id="project" placeholder="例：富山新事務所 電気工事"></div>
+<div class="field"><label>工事名</label><input id="project" placeholder="例：富山新事務所 電気工事"></div>
+<div class="field"><label>現場名</label><input id="site" placeholder="例：富山市○○町"></div>
 <div class="field"><label>元請・会社名</label><input id="customer" placeholder="会社名"></div>
 <div class="field"><label>担当者</label><input id="person" placeholder="担当者"></div>
-<div class="field"><label>見積日</label><input id="date" type="date"></div>
+</div>
+<div class="toolbar" style="margin-top:9px">
+<button class="primary" onclick="newProject()">新規案件</button>
+<button class="gray" onclick="saveData()">💾 この端末に保存</button>
+<button class="gray" onclick="loadData()">↩ 読込</button>
+<button class="gray" onclick="exportJSON()">JSONバックアップ</button>
+<label class="gray" style="text-align:center;padding:10px 12px;cursor:pointer">JSON復元<input id="jsonFile" type="file" accept=".json" class="hidden"></label>
 </div>
 </section>
 
 <section class="card">
-<h2>図面・PDF</h2>
-<div class="upload">
-<input id="file" type="file" accept=".pdf,image/*">
-<label for="file">📎 図面・PDFを選択</label>
-<div id="filename" class="note">PDFまたは画像を選択</div>
+<h2>部屋・エリア</h2>
+<div class="toolbar">
+<input id="roomName" placeholder="例：1F事務室">
+<button class="blue" onclick="addRoom()">＋ 部屋追加</button><button class="gray" onclick="renameRoom()">部屋名変更</button><button class="danger" onclick="deleteRoom()">部屋削除</button>
 </div>
-<div id="preview" class="preview"></div>
-<p class="note">図面を表示しながら、下の拾い出し表へ数量を入力できます。</p>
+<div id="rooms" class="tabs" style="margin-top:9px"></div>
 </section>
 
 <section class="card">
-<h2>拾い出し</h2>
-<div class="actions no-print">
-<button class="btn primary" onclick="addRow()">＋ 項目追加</button>
-<button class="btn success" onclick="addPreset()">標準項目を一括追加</button>
-<button class="btn danger" onclick="clearRows()">全削除</button>
-</div><br>
-<div class="table-wrap"><table id="items">
-<thead><tr><th>区分</th><th>品名・仕様</th><th>数量</th><th>単位</th><th>材料単価</th><th>材料金額</th><th>労務単価</th><th>労務金額</th><th class="no-print">削除</th></tr></thead>
-<tbody></tbody></table></div>
-</section>
-
-<section class="card">
-<h2>経費設定</h2>
-<div class="grid">
-<div class="field"><label>材料掛率 %</label><input id="matRate" type="number" value="100" oninput="calc()"></div>
-<div class="field"><label>労務掛率 %</label><input id="laborRate" type="number" value="100" oninput="calc()"></div>
-<div class="field"><label>諸経費 %</label><input id="expenseRate" type="number" value="10" oninput="calc()"></div>
-<div class="field"><label>消費税 %</label><input id="taxRate" type="number" value="10" oninput="calc()"></div>
+<h2>器具・材料の拾い出し <span class="badge" id="count">0</span></h2>
+<div class="toolbar">
+<select id="maker" onchange="filterSeries()"></select>
+<select id="series" onchange="renderProducts()"></select>
+<input id="search" placeholder="品番・器具名で検索" oninput="renderProducts()">
+</div>
+<div id="products" class="grid-products" style="margin-top:10px"></div>
+<div class="notice" style="margin-top:10px">品番・単価が登録されていない器具は「自由項目」で追加できます。</div>
+<div class="toolbar" style="margin-top:8px">
+<input id="customName" placeholder="自由項目名（例：LED照明 40形2灯）">
+<input id="customModel" placeholder="品番・型式（任意）">
+<input id="customPrice" type="number" min="0" placeholder="定価">
+<button class="blue" onclick="addCustomProduct()">＋ 自由項目を登録</button>
 </div>
 </section>
 
 <section class="card">
-<h2>見積集計</h2>
-<div class="summary">
+<h2>図面拾い</h2>
+<div class="notice">図面画像を選択 → 器具を選択 → 図面をタップ。タップした位置にピンを置き、数量も自動加算します。ピンをタップすると削除できます。</div>
+<div class="toolbar no-print" style="margin-top:9px">
+<input id="file" type="file" accept="image/*">
+<select id="pinModel"></select>
+<button class="gray" onclick="clearPins()">この部屋のピンを全削除</button>
+</div>
+<div class="plan" id="plan" style="margin-top:9px">
+<canvas id="canvas" width="1200" height="700"></canvas>
+</div>
+</section>
+
+<section class="card">
+<h2>関連部材 自動展開</h2>
+<div class="notice">登録済みの関連部材ルールにより、スイッチ・コンセント等の付属部材を自動計上します。</div>
+<div id="parts" style="margin-top:8px"></div>
+</section>
+
+<section class="card">
+<h2>材料定価集計</h2>
+<div id="estimate"></div>
+<div class="summary" style="margin-top:12px">
+<div class="box"><small>材料定価</small><strong id="subTotal">¥0</strong></div>
+<div class="box"><small>消費税</small><strong id="tax">¥0</strong></div>
+<div class="box total" style="grid-column:span 2"><small>税込材料合計</small><strong class="grand" id="total">¥0</strong></div>
+</div>
+<div class="toolbar no-print" style="margin-top:10px">
+<button class="green" onclick="csv()">CSV出力</button>
+<button class="gray" onclick="window.print()">🖨 印刷／PDF保存</button>
+</div>
+</section>
+
+<section class="card">
+<h2>見積・労務計算</h2>
+<div class="notice">材料単価・労務単価は案件ごとに変更できます。数量拾いの結果をそのまま見積計算へ反映できます。</div>
+<div class="tablewrap" style="margin-top:9px">
+<table id="quote"><thead><tr><th>区分</th><th>品名・仕様</th><th>数量</th><th>単位</th><th>材料単価</th><th>労務単価</th><th>材料金額</th><th>労務金額</th><th class="no-print">削除</th></tr></thead><tbody></tbody></table>
+</div>
+<div class="toolbar no-print" style="margin-top:9px">
+<button class="blue" onclick="addQuoteRow()">＋ 項目追加</button><button class="green" onclick="pickupToQuote()">拾い出しを見積へ反映</button>
+<button class="gray" onclick="addPresetQuote()">標準項目追加</button>
+<button class="danger" onclick="clearQuote()">全削除</button>
+</div>
+<div class="grid" style="margin-top:10px">
+<div class="field"><label>材料掛率 %</label><input id="matRate" type="number" value="100" oninput="calcQuote()"></div>
+<div class="field"><label>労務掛率 %</label><input id="laborRate" type="number" value="100" oninput="calcQuote()"></div>
+<div class="field"><label>諸経費 %</label><input id="expenseRate" type="number" value="10" oninput="calcQuote()"></div>
+<div class="field"><label>消費税 %</label><input id="taxRate" type="number" value="10" oninput="calcQuote()"></div>
+</div>
+<div class="summary" style="margin-top:10px">
 <div class="box"><small>材料費</small><strong id="matTotal">¥0</strong></div>
 <div class="box"><small>労務費</small><strong id="laborTotal">¥0</strong></div>
 <div class="box"><small>諸経費</small><strong id="expenseTotal">¥0</strong></div>
 <div class="box total"><small>税込見積金額</small><strong id="grandTotal">¥0</strong></div>
-</div><br>
-<div class="actions no-print">
-<button class="btn success" onclick="exportCSV()">CSV出力</button>
-<button class="btn gray" onclick="window.print()">🖨 印刷／PDF保存</button>
-<button class="btn gray" onclick="saveData()">💾 保存</button>
-<button class="btn gray" onclick="loadData()">↩ 読込</button>
 </div>
 </section>
 
 <section class="card">
-<h2>対応する主な拾い出し</h2>
-<span class="tag">照明</span><span class="tag">スイッチ</span><span class="tag">コンセント</span><span class="tag">LAN</span><span class="tag">電話</span><span class="tag">分電盤</span><span class="tag">ブレーカー</span><span class="tag">PF管</span><span class="tag">CD管</span><span class="tag">電線管</span><span class="tag">ケーブル</span><span class="tag">ラック</span><span class="tag">接地</span><span class="tag">エアコン電源</span>
-<p class="note">材料単価・労務単価は案件ごとに変更してください。</p>
+<h2>対応カテゴリ</h2>
+<div class="notice">照明／スイッチ／コンセント／LAN／電話／分電盤／ブレーカー／PF管／CD管／電線管／ケーブル／ラック／接地／エアコン電源</div>
 </section>
 </main>
-<footer>電工拾い出し © 2026</footer>
+
+<footer><div class="foot"><button class="primary" onclick="saveData()">💾 保存</button><button class="blue" onclick="csv()">CSV</button><button class="gray" onclick="window.print()">印刷</button></div></footer>
+<div id="toast" class="toast"></div>
 
 <script>
-const preset=[
+let P=[
+["Panasonic","コスモシリーズ ワイド21","片切スイッチ","WT5001",280],
+["Panasonic","コスモシリーズ ワイド21","3路スイッチ","WT5002",450],
+["Panasonic","コスモシリーズ ワイド21","4路スイッチ","WT50049",1440],
+["Panasonic","コスモシリーズ ワイド21","ほたる片切スイッチ","WT50519",610],
+["Panasonic","コスモシリーズ ワイド21","ほたる3路スイッチ","WT50529",775],
+["Panasonic","コスモシリーズ ワイド21","ほたる4路スイッチ","WT50549",1770],
+["Panasonic","コスモシリーズ ワイド21","ダブルコンセント","WTF1502WK",420],
+["Panasonic","コスモシリーズ ワイド21","接地ダブルコンセント","WTF13123WK",650],
+["Panasonic","コスモシリーズ ワイド21","1連用プレート","WT8101W",0],
+["Panasonic","コスモシリーズ ワイド21","スイッチ取付枠","WT9201W",0],
+["東芝ライテック","WIDE-i","スイッチ","未登録",0],
+["東芝ライテック","WIDE-i","コンセント","未登録",0],
+["東芝ライテック","WIDE-i","プレート","未登録",0],
+["JIMBO","NKシリーズ","スイッチ","未登録",0],
+["JIMBO","NKシリーズ","コンセント","未登録",0],
+["JIMBO","NKシリーズ","プレート","未登録",0],
+["神保電器","artific series","スイッチ","未登録",0],
+["神保電器","artific series","コンセント","未登録",0],
+["神保電器","J・WIDE SLIM","スイッチ","未登録",0],
+["神保電器","J・WIDE SLIM","コンセント","未登録",0],
+["明工社","MLカラー配線器具","スイッチ","未登録",0],
+["明工社","MLカラー配線器具","コンセント","未登録",0],
+["明工社","医療施設用配線器具","コンセント","未登録",0],
+["アメリカン電機","NEMA","コンセント","未登録",0],
+["アメリカン電機","NEMA","プラグ","未登録",0]
+].map(x=>({maker:x[0],series:x[1],name:x[2],model:x[3],price:x[4]}));
+
+const rules={
+"WT5001":[["WT9201W",1],["WT8101W",1]],
+"WT5002":[["WT9201W",1],["WT8101W",1]],
+"WT50049":[["WT9201W",1],["WT8101W",1]],
+"WT50519":[["WT9201W",1],["WT8101W",1]],
+"WT50529":[["WT9201W",1],["WT8101W",1]],
+"WT50549":[["WT9201W",1],["WT8101W",1]],
+"WTF1502WK":[["WT9201W",1],["WT8101W",1]],
+"WTF13123WK":[["WT9201W",1],["WT8101W",1]]
+};
+
+const quotePreset=[
 ["照明","LED照明器具",1,"台",12000,3500],
 ["電源","2P15Aコンセント",1,"個",900,800],
 ["電源","3路スイッチ",1,"個",1200,900],
@@ -103,49 +216,153 @@ const preset=[
 ["接地","接地工事",1,"式",12000,6000],
 ["空調","エアコン電源工事",1,"式",18000,9000]
 ];
-date.value=new Date().toISOString().slice(0,10);
 
-file.addEventListener("change",e=>{
- const f=e.target.files[0];if(!f)return;
- filename.textContent=f.name+" ("+Math.round(f.size/1024)+"KB)";
- preview.innerHTML="";
- const u=URL.createObjectURL(f);
- if(f.type.startsWith("image/")){let i=document.createElement("img");i.src=u;preview.appendChild(i)}
- else if(f.type==="application/pdf"){let p=document.createElement("iframe");p.src=u;preview.appendChild(p)}
-});
+let rooms=[],cur=-1,img=null;
+const $=id=>document.getElementById(id);
+const yen=n=>"¥"+Math.round(Number(n)||0).toLocaleString("ja-JP");
+const product=m=>P.find(x=>x.model===m);
 
-function addRow(d=["","",1,"式",0,0]){
- const tr=document.createElement("tr");
- tr.innerHTML='<td><input value="'+d[0]+'"></td><td><input value="'+d[1]+'"></td><td><input type="number" min="0" step="0.01" value="'+d[2]+'" oninput="calc()"></td><td><input value="'+d[3]+'"></td><td><input type="number" min="0" value="'+d[4]+'" oninput="calc()"></td><td class="num mat">¥0</td><td><input type="number" min="0" value="'+d[5]+'" oninput="calc()"></td><td class="num labor">¥0</td><td class="no-print"><button class="btn danger" onclick="this.closest(\'tr\').remove();calc()">削除</button></td>';
- document.querySelector("#items tbody").appendChild(tr);calc();
+function toast(s){const t=$("toast");t.textContent=s;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
+
+function sync(){
+ const ms=[...new Set(P.map(x=>x.maker))];
+ $("maker").innerHTML=ms.map(x=>`<option>${x}</option>`).join("");
+ filterSeries();
 }
-function addPreset(){preset.forEach(addRow)}
-function clearRows(){if(confirm("全項目を削除しますか？")){document.querySelector("#items tbody").innerHTML="";calc()}}
-function yen(n){return "¥"+Math.round(n).toLocaleString("ja-JP")}
-function calc(){
- let m=0,l=0;
- document.querySelectorAll("#items tbody tr").forEach(tr=>{
-  let q=+tr.cells[2].querySelector("input").value||0,mp=+tr.cells[4].querySelector("input").value||0,lp=+tr.cells[6].querySelector("input").value||0;
-  let mm=q*mp*(+matRate.value||0)/100,ll=q*lp*(+laborRate.value||0)/100;
-  tr.querySelector(".mat").textContent=yen(mm);tr.querySelector(".labor").textContent=yen(ll);m+=mm;l+=ll;
+function filterSeries(){
+ const ss=[...new Set(P.filter(x=>x.maker===$("maker").value).map(x=>x.series))];
+ $("series").innerHTML='<option value="ALL">全シリーズ</option>'+ss.map(x=>`<option>${x}</option>`).join("");
+ renderProducts();
+}
+function renderProducts(){
+ const q=($("search").value||"").toLowerCase();
+ const list=P.filter(x=>x.maker===$("maker").value&&($("series").value==="ALL"||x.series===$("series").value)&&(`${x.name}${x.model}${x.series}`).toLowerCase().includes(q));
+ $("products").innerHTML="";
+ $("pinModel").innerHTML=list.map(x=>`<option value="${x.model}">${x.name} / ${x.model}</option>`).join("");
+ list.forEach(x=>{
+   const d=document.createElement("div");d.className="item";
+   d.innerHTML=`<div class="name">${x.name}</div><div class="muted">${x.series}</div><div class="small">${x.model}</div><b>${x.price?yen(x.price):"定価未登録"}</b>
+   <div class="qtyrow"><button class="q" onclick="pick('${x.model}',-1)">−</button><div class="qty">${rooms[cur]?.items?.[x.model]||0}</div><button class="q" onclick="pick('${x.model}',1)">＋</button></div>`;
+   $("products").appendChild(d);
  });
- let ex=(m+l)*(+expenseRate.value||0)/100,sub=m+l+ex,tax=sub*(+taxRate.value||0)/100;
- matTotal.textContent=yen(m);laborTotal.textContent=yen(l);expenseTotal.textContent=yen(ex);grandTotal.textContent=yen(sub+tax);
 }
-function rows(){return [...document.querySelectorAll("#items tbody tr")].map(t=>[t.cells[0].querySelector("input").value,t.cells[1].querySelector("input").value,t.cells[2].querySelector("input").value,t.cells[3].querySelector("input").value,t.cells[4].querySelector("input").value,t.cells[6].querySelector("input").value])}
-function exportCSV(){
- let c="区分,品名・仕様,数量,単位,材料単価,材料金額,労務単価,労務金額\n";
- document.querySelectorAll("#items tbody tr").forEach(t=>c+=[t.cells[0].querySelector("input").value,t.cells[1].querySelector("input").value,t.cells[2].querySelector("input").value,t.cells[3].querySelector("input").value,t.cells[4].querySelector("input").value,t.querySelector(".mat").textContent.replace(/[¥,]/g,""),t.cells[6].querySelector("input").value,t.querySelector(".labor").textContent.replace(/[¥,]/g,"")].map(x=>'"'+String(x).replaceAll('"','""')+'"').join(",")+"\n");
- let a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+c],{type:"text/csv"}));a.download=(project.value||"電工拾い出し")+".csv";a.click();
+function addCustomProduct(){
+ const name=$("customName").value.trim(); if(!name){alert("自由項目名を入力してください");return}
+ const model=$("customModel").value.trim()||("CUSTOM-"+Date.now()); const price=Number($("customPrice").value)||0;
+ if(P.some(x=>x.model===model)){alert("同じ品番・型式が登録されています");return}
+ P.push({maker:"自由登録",series:"自由項目",name,model,price});
+ $("customName").value="";$("customModel").value="";$("customPrice").value="";sync();$("maker").value="自由登録";filterSeries();toast("自由項目を登録しました");
 }
-function saveData(){
- localStorage.setItem("denkoPickup",JSON.stringify({project:project.value,customer:customer.value,person:person.value,date:date.value,matRate:matRate.value,laborRate:laborRate.value,expenseRate:expenseRate.value,taxRate:taxRate.value,rows:rows()}));alert("この端末に保存しました。");
+function renameRoom(){if(cur<0)return alert("部屋を選択してください");const n=prompt("新しい部屋名",rooms[cur].name);if(n&&n.trim()){rooms[cur].name=n.trim();render();}}
+function deleteRoom(){if(cur<0)return alert("部屋を選択してください");if(confirm(`「${rooms[cur].name}」を削除しますか？`)){rooms.splice(cur,1);cur=Math.min(cur,rooms.length-1);render();}}
+
+function addRoom(){
+ const n=$("roomName").value.trim();if(!n)return;
+ rooms.push({name:n,items:{},pins:[]});cur=rooms.length-1;$("roomName").value="";render();toast("部屋を追加しました");
 }
-function loadData(){
- let d=JSON.parse(localStorage.getItem("denkoPickup")||"null");if(!d)return alert("保存データがありません。");
- project.value=d.project||"";customer.value=d.customer||"";person.value=d.person||"";date.value=d.date||"";matRate.value=d.matRate||100;laborRate.value=d.laborRate||100;expenseRate.value=d.expenseRate||10;taxRate.value=d.taxRate||10;
- document.querySelector("#items tbody").innerHTML="";(d.rows||[]).forEach(addRow);calc();alert("読み込みました。");
+function pick(m,d){
+ if(cur<0){alert("先に部屋を追加してください");return}
+ rooms[cur].items[m]=(rooms[cur].items[m]||0)+d;
+ if(rooms[cur].items[m]<0)rooms[cur].items[m]=0;
+ render();
 }
-calc();
+function renderRooms(){
+ $("rooms").innerHTML="";
+ rooms.forEach((r,i)=>{
+   const b=document.createElement("button");b.className="tab"+(i===cur?" on":"");b.textContent=r.name;
+   b.onclick=()=>{cur=i;render()};$("rooms").appendChild(b);
+ });
+ $("count").textContent=rooms[cur]?Object.values(rooms[cur].items).reduce((a,b)=>a+b,0):0;
+}
+function expanded(){
+ const s={};
+ rooms.forEach(r=>Object.entries(r.items||{}).forEach(([m,q])=>{
+   s[m]=(s[m]||0)+q;
+   (rules[m]||[]).forEach(([a,n])=>s[a]=(s[a]||0)+q*n);
+ }));
+ return s;
+}
+function renderEstimate(){
+ const s=expanded();let h="",tot=0;
+ Object.entries(s).forEach(([m,q])=>{
+   const p=product(m),c=q*(p?.price||0);tot+=c;
+   h+=`<div class="list"><span>${p?.name||m}<br><small class="muted">${p?.maker||""} ${p?.series||""} / ${m}</small></span><b>${q}</b><span>${p?.price?yen(p.price):"未登録"}</span><b class="right">${p?.price?yen(c):"—"}</b></div>`;
+ });
+ $("estimate").innerHTML=h||'<div class="muted">まだありません</div>';
+ $("subTotal").textContent=yen(tot);const t=Math.round(tot*.1);$("tax").textContent=yen(t);$("total").textContent=yen(tot+t);
+}
+function renderParts(){
+ let s={};rooms.forEach(r=>Object.entries(r.items||{}).forEach(([m,q])=>(rules[m]||[]).forEach(([a,n])=>s[a]=(s[a]||0)+q*n)));
+ let h="";
+ Object.entries(s).forEach(([m,q])=>{const p=product(m);h+=`<div class="list"><span>${p?.name||"関連部材"}<br><small class="muted">${m}</small></span><b>${q}</b><span>${p?.price?yen(p.price):"未登録"}</span><b class="right">${p?.price?yen(p.price*q):"—"}</b></div>`});
+ $("parts").innerHTML=h||'<div class="muted">関連部材はありません</div>';
+}
+const cv=$("canvas"),cx=cv.getContext("2d");
+function draw(){
+ cx.clearRect(0,0,1200,700);
+ if(img){const s=Math.min(1200/img.width,700/img.height),w=img.width*s,h=img.height*s;cx.drawImage(img,(1200-w)/2,(700-h)/2,w,h)}
+ else{cx.fillStyle="#f8fafc";cx.fillRect(0,0,1200,700);cx.fillStyle="#94a3b8";cx.font="22px sans-serif";cx.textAlign="center";cx.fillText("図面画像を選択してください",600,350)}
+}
+$("file").onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{img=im;draw();renderPins()};im.src=URL.createObjectURL(f)};
+cv.onclick=e=>{
+ if(cur<0){alert("先に部屋を追加してください");return}
+ const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*1200,y=(e.clientY-r.top)/r.height*700,m=$("pinModel").value;if(!m)return;
+ rooms[cur].pins.push({x,y,model:m});pick(m,1);
+};
+function renderPins(){
+ draw();document.querySelectorAll(".pin").forEach(x=>x.remove());if(cur<0)return;
+ rooms[cur].pins.forEach((p,i)=>{const b=document.createElement("button");b.className="pin";b.textContent="+";b.title=product(p.model)?.name||p.model;b.style.left=p.x/1200*100+"%";b.style.top=p.y/700*100+"%";
+ b.onclick=e=>{e.stopPropagation();if(confirm((product(p.model)?.name||p.model)+" のピンを削除しますか？")){rooms[cur].pins.splice(i,1);rooms[cur].items[p.model]=Math.max(0,(rooms[cur].items[p.model]||0)-1);render()}};$("plan").appendChild(b)});
+}
+function clearPins(){if(cur<0)return;if(confirm("この部屋のピンを全て削除しますか？")){rooms[cur].pins=[];render()}}
+function addQuoteRow(d=["","",1,"式",0,0]){
+ const tr=document.createElement("tr");
+ tr.innerHTML=`<td><input value="${esc(d[0])}"></td><td><input value="${esc(d[1])}"></td><td><input type="number" min="0" step="0.01" value="${d[2]}" oninput="calcQuote()"></td><td><input value="${esc(d[3])}"></td><td><input type="number" min="0" value="${d[4]}" oninput="calcQuote()"></td><td><input type="number" min="0" value="${d[5]}" oninput="calcQuote()"></td><td class="mat right">¥0</td><td class="labor right">¥0</td><td class="no-print"><button class="danger" onclick="this.closest('tr').remove();calcQuote()">削除</button></td>`;
+ $("quote").querySelector("tbody").appendChild(tr);calcQuote();
+}
+function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll('"',"&quot;").replaceAll("<","&lt;").replaceAll(">","&gt;")}
+function addPresetQuote(){quotePreset.forEach(addQuoteRow)}
+function clearQuote(){if(confirm("見積項目を全て削除しますか？")){$("quote").querySelector("tbody").innerHTML="";calcQuote()}}
+function calcQuote(){
+ let m=0,l=0;
+ $("quote").querySelectorAll("tbody tr").forEach(tr=>{
+   const q=+tr.cells[2].querySelector("input").value||0,mp=+tr.cells[4].querySelector("input").value||0,lp=+tr.cells[5].querySelector("input").value||0;
+   const mm=q*mp*(+$("matRate").value||0)/100,ll=q*lp*(+$("laborRate").value||0)/100;
+   tr.querySelector(".mat").textContent=yen(mm);tr.querySelector(".labor").textContent=yen(ll);m+=mm;l+=ll;
+ });
+ const ex=(m+l)*(+$("expenseRate").value||0)/100,sub=m+l+ex,tax=sub*(+$("taxRate").value||0)/100;
+ $("matTotal").textContent=yen(m);$("laborTotal").textContent=yen(l);$("expenseTotal").textContent=yen(ex);$("grandTotal").textContent=yen(sub+tax);
+}
+function pickupToQuote(){
+ const s=expanded(); let added=0;
+ Object.entries(s).forEach(([m,q])=>{const p=product(m); if(!p)return; addQuoteRow(["拾い出し",`${p.name} ${p.model}`,q,"個",p.price||0,0]);added++;});
+ if(added) toast(added+"項目を見積へ反映しました"); else alert("拾い出しデータがありません");
+}
+
+function quoteRows(){return [...$("quote").querySelectorAll("tbody tr")].map(t=>[t.cells[0].querySelector("input").value,t.cells[1].querySelector("input").value,t.cells[2].querySelector("input").value,t.cells[3].querySelector("input").value,t.cells[4].querySelector("input").value,t.cells[5].querySelector("input").value])}
+function state(){return{version:3,products:P,project:$("project").value,site:$("site").value,customer:$("customer").value,person:$("person").value,rooms,matRate:$("matRate").value,laborRate:$("laborRate").value,expenseRate:$("expenseRate").value,taxRate:$("taxRate").value,quoteRows:quoteRows()}}
+function applyState(d){
+ if(Array.isArray(d.products)){P.length=0;d.products.forEach(x=>P.push(x));}
+ $("project").value=d.project||"";$("site").value=d.site||"";$("customer").value=d.customer||"";$("person").value=d.person||"";
+ rooms=Array.isArray(d.rooms)?d.rooms:[];cur=rooms.length?rooms.length-1:-1;
+ $("matRate").value=d.matRate??100;$("laborRate").value=d.laborRate??100;$("expenseRate").value=d.expenseRate??10;$("taxRate").value=d.taxRate??10;
+ $("quote").querySelector("tbody").innerHTML="";(d.quoteRows||[]).forEach(addQuoteRow);render();calcQuote();
+}
+function saveData(){localStorage.setItem("denkoPickupComplete",JSON.stringify(state()));toast("この端末に保存しました")}
+function loadData(){const d=JSON.parse(localStorage.getItem("denkoPickupComplete")||"null");if(!d)return alert("保存データがありません");applyState(d);toast("読み込みました")}
+function exportJSON(){const b=new Blob([JSON.stringify(state(),null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=(($("project").value||"電工拾い出し")+".json");a.click();URL.revokeObjectURL(u)}
+$("jsonFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{applyState(JSON.parse(r.result));toast("JSONを復元しました")}catch(_){alert("JSONファイルを読み込めません")}};r.readAsText(f)}
+function newProject(){if(confirm("現在の案件データを消して新規案件にしますか？")){rooms=[];cur=-1;$("project").value="";$("site").value="";$("customer").value="";$("person").value="";$("quote").querySelector("tbody").innerHTML="";render();calcQuote();toast("新規案件にしました")}}
+function csv(){
+ const s=expanded(),rows=[["工事名",$("project").value],["現場名",$("site").value],["元請・会社名",$("customer").value],[],["メーカー","シリーズ","器具","品番","数量","定価","金額"]];let tot=0;
+ Object.entries(s).forEach(([m,q])=>{const p=product(m),c=q*(p?.price||0);tot+=c;rows.push([p?.maker||"",p?.series||"",p?.name||"",m,q,p?.price||0,c])});
+ rows.push([],["材料定価合計","","","","","",tot]);
+ const b="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\n"),u=URL.createObjectURL(new Blob([b],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");a.href=u;a.download=(($("project").value||"電工拾い出し")+".csv");a.click();URL.revokeObjectURL(u);
+}
+function render(){sync();renderRooms();renderProducts();renderEstimate();renderParts();renderPins()}
+render();calcQuote();
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")localStorage.setItem("denkoPickupComplete",JSON.stringify(state()))});
+window.addEventListener("beforeunload",()=>localStorage.setItem("denkoPickupComplete",JSON.stringify(state())));
 </script>
-</body></html>
+</body>
+</html>
