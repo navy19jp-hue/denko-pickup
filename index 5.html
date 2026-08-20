@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>株式会社J.style 拾い出しアプリ</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;margin:0;background:#f5f7f9;color:#17202a}
+header{background:#111827;color:#fff;padding:18px 20px;position:sticky;top:0;z-index:3}
+header h1{font-size:20px;margin:0 0 4px} header p{margin:0;opacity:.75;font-size:12px}
+main{max-width:1100px;margin:auto;padding:18px}
+.card{background:#fff;border:1px solid #dbe1e8;border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px #0000000a}
+h2{font-size:17px;margin:0 0 12px}
+button{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;background:#1976d2;color:white}
+button.secondary{background:#e8edf3;color:#26323d} button.green{background:#238636}
+button:disabled{opacity:.5;cursor:not-allowed}
+input,select{padding:10px;border:1px solid #cbd5df;border-radius:9px;font-size:14px;box-sizing:border-box}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.drop{border:2px dashed #aeb9c6;border-radius:12px;padding:25px;text-align:center;background:#fafcff}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #e6e9ed;text-align:left}th{background:#f1f4f7;position:sticky;top:70px}
+.badge{display:inline-block;padding:3px 7px;border-radius:99px;background:#fff3cd;color:#765600;font-size:11px}
+.status{font-size:13px;color:#52606d;margin-top:8px;line-height:1.6}
+.progress{height:10px;background:#e8edf3;border-radius:99px;overflow:hidden;margin-top:10px}.bar{height:100%;width:0;background:#238636;transition:width .2s}
+.total{font-size:20px;font-weight:800;text-align:right}
+.notice{padding:10px;border-radius:10px;background:#eef7ff;color:#174a7a;font-size:13px;margin-top:10px}
+@media(max-width:750px){.grid{grid-template-columns:1fr 1fr}table{font-size:12px}th,td{padding:6px}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
+</head>
+<body>
+<header><h1>株式会社J.style 拾い出しアプリ</h1><p>図面PDF・画像 → 電気設備拾い出し → 見積データ</p></header>
+<main>
+<section class="card">
+<h2>① 図面アップロード</h2>
+<div class="drop">PDFまたは画像を選択<br><br><input id="file" type="file" accept=".pdf,image/*"></div>
+<div class="status" id="fileStatus">ファイル未選択</div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<div class="notice">※ PDFの文字情報を優先して解析します。スキャン図面はOCRを使います。最終数量は必ず図面と照合してください。</div>
+</section>
+
+<section class="card">
+<h2>② 案件情報</h2>
+<div class="grid">
+<input id="project" placeholder="案件名"><input id="customer" placeholder="施主・客先">
+<input id="site" placeholder="施工場所"><input id="drawing" placeholder="図面名称">
+</div>
+</section>
+
+<section class="card">
+<h2>③ 拾い出し結果</h2>
+<p class="status">「図面を解析する」を押すと、アップロードしたPDF/画像を実際に読み込み、文字・記号の候補を作成します。</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+<button id="add">項目追加</button><button class="green" id="analyze">図面を解析する</button><button class="secondary" id="export">JSON出力</button>
+</div>
+<div style="overflow:auto"><table id="tbl"><thead><tr>
+<th>区分</th><th>記号</th><th>品名</th><th>仕様</th><th>数量</th><th>単位</th><th>メーカー</th><th>型番/品番</th><th>定価</th><th>状態</th>
+</tr></thead><tbody></tbody></table></div>
+</section>
+
+<section class="card"><h2>④ 見積集計</h2>
+<div class="grid"><input id="material" type="number" placeholder="材料費"><input id="labor" type="number" placeholder="労務費">
+<input id="expense" type="number" placeholder="経費"><input id="tax" type="number" value="10" placeholder="消費税%"></div>
+<div class="total" id="total">合計 0 円</div></section>
+</main>
+
+<script type="module">
+import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+
+const fileEl=document.getElementById("file"), statusEl=document.getElementById("fileStatus");
+const bar=document.getElementById("bar"), tbody=document.querySelector("#tbl tbody");
+const addBtn=document.getElementById("add"), analyzeBtn=document.getElementById("analyze");
+
+function addRow(v=["","","","","","個","","",""]){
+ const tr=document.createElement("tr");
+ const vals=[...v];
+ tr.innerHTML=vals.slice(0,6).map((x,i)=>`<td><input value="${String(x).replaceAll('"','&quot;')}" style="width:${i==2?180:100}px"></td>`).join("")+
+ `<td><input value="${v[6]||""}" placeholder="メーカー" style="width:100px"></td>
+  <td><input value="${v[7]||""}" placeholder="型番/品番" style="width:120px"></td>
+  <td><input value="${v[8]||""}" type="number" placeholder="定価" style="width:90px"></td>
+  <td><span class="badge">要確認</span></td>`;
+ tbody.appendChild(tr);
+}
+function clearRows(){tbody.innerHTML=""}
+[
+["照明","CL","直付けシーリング","","","個"],["照明","DL","ダウンライト","","","個"],
+["スイッチ","","スイッチ","","","個"],["スイッチ","3","3路スイッチ","","","個"],
+["コンセント","2","2口壁付コンセント","","","個"],["コンセント","E","1口+アース","","","個"],
+["情報","TV","TVコンセント","","","個"],["情報","LAN","LAN","","","個"],
+["空調","AC100V","エアコン用コンセント100V","","","個"],["空調","AC200V","エアコン用コンセント200V","","","個"],
+["換気","","換気扇","","","台"],["盤","","分電盤","","","面"]
+].forEach(addRow);
+addBtn.onclick=()=>addRow();
+
+fileEl.onchange=()=>{const f=fileEl.files[0]; if(f){statusEl.textContent=`選択: ${f.name}（${Math.round(f.size/1024)} KB）`; drawing.value=f.name;}};
+
+function setProgress(n,msg){bar.style.width=n+"%";statusEl.textContent=msg;}
+
+function countHits(text, patterns){
+ const out=[]; for(const p of patterns){
+   const re=new RegExp(p.re,"gi"); const m=text.match(re);
+   if(m && m.length) out.push({...p,count:m.length});
+ } return out;
+}
+const patterns=[
+ {re:"ダウンライト|ダウンライト\\b",cat:"照明",sym:"DL",name:"ダウンライト",unit:"個"},
+ {re:"シーリング|直付け",cat:"照明",sym:"CL",name:"直付けシーリング",unit:"個"},
+ {re:"3路|三路",cat:"スイッチ",sym:"3",name:"3路スイッチ",unit:"個"},
+ {re:"4路|四路",cat:"スイッチ",sym:"4",name:"4路スイッチ",unit:"個"},
+ {re:"スイッチ",cat:"スイッチ",sym:"",name:"スイッチ",unit:"個"},
+ {re:"コンセント",cat:"コンセント",sym:"",name:"コンセント",unit:"個"},
+ {re:"TV",cat:"情報",sym:"TV",name:"TVコンセント",unit:"個"},
+ {re:"LAN",cat:"情報",sym:"LAN",name:"LAN",unit:"個"},
+ {re:"インターホン",cat:"インターホン",sym:"",name:"インターホン",unit:"台"},
+ {re:"換気扇|換気",cat:"換気",sym:"",name:"換気扇",unit:"台"},
+ {re:"分電盤",cat:"盤",sym:"",name:"分電盤",unit:"面"},
+ {re:"エアコン|AC100|AC200",cat:"空調",sym:"AC",name:"エアコン関連",unit:"個"}
+];
+
+async function extractPdf(file){
+ const buf=await file.arrayBuffer();
+ const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+ let text="";
+ for(let p=1;p<=pdf.numPages;p++){
+   setProgress(Math.round((p/pdf.numPages)*60),`PDF解析中… ${p}/${pdf.numPages}ページ`);
+   const page=await pdf.getPage(p);
+   const tc=await page.getTextContent();
+   text+="\n"+tc.items.map(x=>x.str).join(" ");
+ }
+ return {text,pages:pdf.numPages};
+}
+async function extractImage(file){
+ // Browser-side OCR is loaded only when needed.
+ const mod=await import("https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.esm.min.js");
+ setProgress(20,"画像OCRを準備中…");
+ const {createWorker}=mod;
+ const worker=await createWorker("jpn");
+ setProgress(40,"画像をOCR解析中…");
+ const {data}=await worker.recognize(file);
+ await worker.terminate();
+ return {text:data.text,pages:1};
+}
+
+analyzeBtn.onclick=async()=>{
+ const f=fileEl.files[0];
+ if(!f){alert("先に図面PDFまたは画像を選択してください。");return;}
+ analyzeBtn.disabled=true;
+ try{
+   setProgress(5,"解析を開始しています…");
+   const result=f.type==="application/pdf" ? await extractPdf(f) : await extractImage(f);
+   setProgress(70,"記号・設備候補を集計中…");
+   const hits=countHits(result.text,patterns);
+   clearRows();
+   if(!hits.length){
+     addRow(["その他","","解析候補（要確認）","","1","式"]);
+   }else{
+     for(const h of hits) addRow([h.cat,h.sym,h.name,"",h.count,h.unit]);
+   }
+   setProgress(100,`解析完了：${result.pages}ページ／候補 ${hits.length}件。数量は図面と照合してください。`);
+ }catch(e){
+   console.error(e);
+   setProgress(0,"解析に失敗しました。PDFの破損、通信制限、OCR読み込み失敗などを確認してください。");
+   alert("解析を開始できませんでした。\n"+(e?.message||e));
+ }finally{analyzeBtn.disabled=false;}
+};
+
+["material","labor","expense","tax"].forEach(id=>document.getElementById(id).oninput=()=>{
+ const m=+material.value||0,l=+labor.value||0,e=+expense.value||0,t=+tax.value||0;
+ total.textContent=`合計 ${Math.round((m+l+e)*(1+t/100)).toLocaleString()} 円`;
+});
+document.getElementById("export").onclick=()=>{
+ const rows=[...tbody.querySelectorAll("tr")].map(tr=>{const a=[...tr.querySelectorAll("input")].map(x=>x.value);
+ return {category:a[0],symbol:a[1],item_name:a[2],specification:a[3],quantity:a[4],unit:a[5],manufacturer:a[6],model_number:a[7],list_price:a[8],status:"needs_verification"}});
+ const data={app:"株式会社J.style 拾い出しアプリ",project:{name:project.value,customer:customer.value,site:site.value,drawing:drawing.value},items:rows};
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="jstyle_pickup_result.json";a.click();
+};
+</script>
+</body></html>
