@@ -2,133 +2,117 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>株式会社J.style 拾い出しアプリ</title>
 <style>
-body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;margin:0;background:#f5f7f9;color:#17202a}
-header{background:#111827;color:#fff;padding:18px 20px;position:sticky;top:0;z-index:3}
-header h1{font-size:20px;margin:0 0 4px} header p{margin:0;opacity:.75;font-size:12px}
-main{max-width:1100px;margin:auto;padding:18px}
-.card{background:#fff;border:1px solid #dbe1e8;border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px #0000000a}
-h2{font-size:17px;margin:0 0 12px}
-button{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;background:#1976d2;color:white}
-button.secondary{background:#e8edf3;color:#26323d} button.green{background:#238636}
-input,select{padding:10px;border:1px solid #cbd5df;border-radius:9px;font-size:14px;box-sizing:border-box}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.drop{border:2px dashed #aeb9c6;border-radius:12px;padding:25px;text-align:center;background:#fafcff}
-table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #e6e9ed;text-align:left}th{background:#f1f4f7;position:sticky;top:70px}
-.badge{display:inline-block;padding:3px 7px;border-radius:99px;background:#fff3cd;color:#765600;font-size:11px}
-.status{font-size:13px;color:#52606d;margin-top:8px}
-.total{font-size:20px;font-weight:800;text-align:right}
-@media(max-width:750px){.grid{grid-template-columns:1fr 1fr}table{font-size:12px}th,td{padding:6px}}
+*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;margin:0;background:#f5f7f9;color:#17202a}header{background:#111827;color:#fff;padding:18px 20px;position:sticky;top:0;z-index:10}header h1{font-size:22px;margin:0 0 5px}header p{margin:0;opacity:.78;font-size:13px}main{max-width:1180px;margin:auto;padding:16px}.card{background:#fff;border:1px solid #dbe1e8;border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px #0000000a}h2{font-size:19px;margin:0 0 12px}.drop{border:2px dashed #aeb9c6;border-radius:12px;padding:28px;text-align:center;background:#fafcff}.filepick{display:inline-block;background:#fff;border:1px solid #cbd5df;border-radius:10px;padding:10px 14px;font-weight:700}input,select{padding:10px;border:1px solid #cbd5df;border-radius:9px;font-size:14px;width:100%}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}button{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;background:#1976d2;color:#fff}button.secondary{background:#e8edf3;color:#26323d}button.green{background:#238636}button:disabled{opacity:.55;cursor:not-allowed}.actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.status{font-size:13px;color:#52606d;margin-top:9px;line-height:1.6}.progress{height:10px;background:#e8edf3;border-radius:99px;overflow:hidden;margin-top:10px}.bar{height:100%;width:0;background:#238636;transition:width .2s}.notice{padding:10px;border-radius:10px;background:#eef7ff;color:#174a7a;font-size:13px;margin-top:10px}.ok{background:#eaf8ef;color:#176b35}.error{background:#fff0f0;color:#9b1c1c}.tablewrap{overflow:auto}table{width:100%;min-width:1080px;border-collapse:collapse;font-size:13px}th,td{padding:7px;border-bottom:1px solid #e6e9ed;text-align:left;vertical-align:middle}th{background:#f1f4f7;position:sticky;top:72px;z-index:2}td input{min-width:85px}.badge{display:inline-block;padding:4px 7px;border-radius:99px;background:#fff3cd;color:#765600;font-size:11px;font-weight:700}.total{font-size:20px;font-weight:800;text-align:right;margin-top:12px}.small{font-size:12px;color:#687684}.busy{display:none;margin-left:4px}.busy.show{display:inline}.danger{color:#a61b1b}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}.metric{background:#f7f9fb;border-radius:10px;padding:10px}.metric b{display:block;font-size:18px;margin-top:4px}@media(max-width:750px){main{padding:10px}.grid,.summary{grid-template-columns:1fr 1fr}header h1{font-size:19px}.drop{padding:20px 10px}}
 </style>
+<!-- GitHub Pagesで安定しやすいUMD版。module importは使わない -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 <header><h1>株式会社J.style 拾い出しアプリ</h1><p>図面PDF・画像 → 電気設備拾い出し → 見積データ</p></header>
 <main>
 <section class="card">
 <h2>① 図面アップロード</h2>
-<div class="drop" id="drop">PDFまたは画像を選択<br><br><input id="file" type="file" accept=".pdf,image/*"></div>
+<div class="drop">
+  <div style="font-size:18px;font-weight:800;margin-bottom:10px">PDFまたは画像を選択</div>
+  <label class="filepick">ファイルを選択 <input id="file" type="file" accept=".pdf,image/*" hidden></label>
+  <div class="small" style="margin-top:10px">PDF / JPG / PNG / WEBP</div>
+</div>
 <div class="status" id="fileStatus">ファイル未選択</div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<div class="notice" id="notice">図面を選択しただけでは解析しません。「図面を解析する」を押した時に解析を開始します。</div>
 </section>
-
 <section class="card">
 <h2>② 案件情報</h2>
 <div class="grid">
-<input id="project" placeholder="案件名">
-<input id="customer" placeholder="施主・客先">
-<input id="site" placeholder="施工場所">
-<input id="drawing" placeholder="図面名称">
+<input id="project" placeholder="案件名"><input id="customer" placeholder="施主・客先"><input id="site" placeholder="施工場所"><input id="drawing" placeholder="図面名称">
 </div>
 </section>
-
 <section class="card">
 <h2>③ 拾い出し結果</h2>
-<p class="status">図面から候補項目を作成します。数量はAI/画像解析の結果を確認して確定してください。</p>
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
-<button id="add">項目追加</button>
-<button class="green" id="analyze">図面を解析する</button>
-<button class="secondary" id="export">JSON出力</button>
-</div>
-<div style="overflow:auto">
-<table id="tbl"><thead><tr>
-<th>区分</th><th>記号</th><th>品名</th><th>仕様</th><th>数量</th><th>単位</th><th>メーカー</th><th>型番/品番</th><th>定価</th><th>状態</th>
-</tr></thead><tbody></tbody></table>
-</div>
+<p class="status">PDFは文字情報を読み取り、画像・スキャンPDFはOCRで文字を読み取って候補を作ります。数量は図面と照合して確定してください。</p>
+<div class="actions"><button id="add">項目追加</button><button class="green" id="analyze">図面を解析する <span id="busy" class="busy">●</span></button><button class="secondary" id="export">JSON出力</button><button class="secondary" id="csv">CSV出力</button></div>
+<div class="summary"><div class="metric">読み取りページ<b id="pages">0</b></div><div class="metric">候補種類<b id="kinds">0</b></div><div class="metric">候補数量<b id="qty">0</b></div><div class="metric">要確認<b id="checks">0</b></div></div>
+<div class="tablewrap" style="margin-top:12px"><table id="tbl"><thead><tr><th>区分</th><th>記号</th><th>品名</th><th>仕様</th><th>数量</th><th>単位</th><th>メーカー</th><th>型番/品番</th><th>定価</th><th>状態</th></tr></thead><tbody></tbody></table></div>
 </section>
-
-<section class="card">
-<h2>④ 見積集計</h2>
-<div class="grid">
-<input id="material" type="number" placeholder="材料費">
-<input id="labor" type="number" placeholder="労務費">
-<input id="expense" type="number" placeholder="経費">
-<input id="tax" type="number" value="10" placeholder="消費税%">
-</div>
-<div class="total" id="total">合計 0 円</div>
-</section>
+<section class="card"><h2>④ 見積集計</h2><div class="grid"><input id="material" type="number" placeholder="材料費"><input id="labor" type="number" placeholder="労務費"><input id="expense" type="number" placeholder="経費"><input id="tax" type="number" value="10" placeholder="消費税%"></div><div class="total" id="total">合計 0 円</div></section>
 </main>
 <script>
-const items=[
-["照明","CL","直付けシーリング","","","個"],
-["照明","DL","ダウンライト","","","個"],
-["照明","","ペンダント","","","個"],
-["スイッチ","","スイッチ","","","個"],
-["スイッチ","3","3路スイッチ","","","個"],
-["スイッチ","4","4路スイッチ","","","個"],
-["コンセント","1","1口壁付コンセント","","","個"],
-["コンセント","2","2口壁付コンセント","","","個"],
-["コンセント","3","3口壁付コンセント","","","個"],
-["コンセント","E","1口+アース","","","個"],
-["コンセント","2E","2口+アース","","","個"],
-["コンセント","2WPE","外部防水2口コンセント","","","個"],
-["情報","TV","TVコンセント","","","個"],
-["情報","TEL","TELコンセント","","","個"],
-["情報","LAN","LAN","","","個"],
-["空調","AC100V","エアコン用コンセント100V","","","個"],
-["空調","AC200V","エアコン用コンセント200V","","","個"],
-["換気","","換気扇","","","台"],
-["換気","","天井換気扇","","","台"],
-["インターホン","t","インターホン子機","","","台"],
-["インターホン","T","インターホン親機","","","台"],
-["設備","R","給湯機リモコン","","","台"],
-["盤","","分電盤","","","面"],
-["その他","","専用回路コンセント","","","個"],
-["その他","","スポットライト","","","個"],
-["その他","2+USB","2口壁付コンセント+USB1口","","","個"]
+'use strict';
+const $=id=>document.getElementById(id);
+const fileEl=$('file'), statusEl=$('fileStatus'), bar=$('bar'), notice=$('notice'), tbody=document.querySelector('#tbl tbody');
+const analyzeBtn=$('analyze'), busy=$('busy');
+const patterns=[
+ {re:/直付けシーリング|シーリング/,cat:'照明',sym:'CL',name:'直付けシーリング',unit:'個'},
+ {re:/ダウンライト/,cat:'照明',sym:'DL',name:'ダウンライト',unit:'個'},
+ {re:/ペンダント/,cat:'照明',sym:'P',name:'ペンダント',unit:'個'},
+ {re:/スポットライト/,cat:'照明',sym:'SP',name:'スポットライト',unit:'個'},
+ {re:/引っ掛けシーリング|引掛シーリング/,cat:'照明',sym:'CS',name:'引っ掛けシーリング',unit:'個'},
+ {re:/4路|四路/,cat:'スイッチ',sym:'4',name:'4路スイッチ',unit:'個'},
+ {re:/3路|三路/,cat:'スイッチ',sym:'3',name:'3路スイッチ',unit:'個'},
+ {re:/調光器/,cat:'スイッチ',sym:'調光',name:'調光器',unit:'個'},
+ {re:/スイッチ/,cat:'スイッチ',sym:'',name:'スイッチ',unit:'個'},
+ {re:/3口壁付コンセント/,cat:'コンセント',sym:'3',name:'3口壁付コンセント',unit:'個'},
+ {re:/2口壁付コンセント/,cat:'コンセント',sym:'2',name:'2口壁付コンセント',unit:'個'},
+ {re:/2E/,cat:'コンセント',sym:'2E',name:'2口+アースコンセント',unit:'個'},
+ {re:/1口\+アース|1口壁付コンセント/,cat:'コンセント',sym:'E',name:'1口+アース/1口壁付コンセント',unit:'個'},
+ {re:/コンセント/,cat:'コンセント',sym:'',name:'コンセント',unit:'個'},
+ {re:/TVコンセント|TV/,cat:'情報',sym:'TV',name:'TVコンセント',unit:'個'},
+ {re:/LAN/,cat:'情報',sym:'LAN',name:'LAN',unit:'個'},
+ {re:/TELコンセント|TEL/,cat:'情報',sym:'TEL',name:'TELコンセント',unit:'個'},
+ {re:/インターホン親機/,cat:'インターホン',sym:'親',name:'インターホン親機',unit:'台'},
+ {re:/インターホン子機/,cat:'インターホン',sym:'子',name:'インターホン子機',unit:'台'},
+ {re:/エアコン用コンセント100V|AC100V/,cat:'空調',sym:'AC100V',name:'エアコン用コンセント100V',unit:'個'},
+ {re:/エアコン用コンセント200V|AC200V/,cat:'空調',sym:'AC200V',name:'エアコン用コンセント200V',unit:'個'},
+ {re:/天井換気扇/,cat:'換気',sym:'',name:'天井換気扇',unit:'台'},
+ {re:/換気扇/,cat:'換気',sym:'',name:'換気扇',unit:'台'},
+ {re:/分電盤/,cat:'盤',sym:'',name:'分電盤',unit:'面'},
+ {re:/熱感知器/,cat:'防災',sym:'熱',name:'熱感知器',unit:'個'},
+ {re:/煙感知器/,cat:'防災',sym:'煙',name:'煙感知器',unit:'個'}
 ];
-
-function addRow(v=["","","","","","個"]){
- const tr=document.createElement("tr");
- tr.innerHTML=v.map((x,i)=>`<td><input value="${x}" style="width:${i==2?180:100}px"></td>`).join("")+
- `<td><input placeholder="メーカー" style="width:100px"></td><td><input placeholder="型番/品番" style="width:120px"></td><td><input type="number" placeholder="定価" style="width:90px"></td><td><span class="badge">要確認</span></td>`;
- document.querySelector("#tbl tbody").appendChild(tr);
+function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function addRow(v=['','','','','1','個','','','']){
+ const tr=document.createElement('tr');
+ const widths=[95,80,180,150,75,65,100,130,90];
+ for(let i=0;i<9;i++){const td=document.createElement('td');const inp=document.createElement('input');inp.value=v[i]??'';inp.style.width=widths[i]+'px';if(i===8)inp.type='number';td.appendChild(inp);tr.appendChild(td)}
+ const td=document.createElement('td');td.innerHTML='<span class="badge">要確認</span>';tr.appendChild(td);tbody.appendChild(tr);return tr;
 }
-items.forEach(x=>addRow(x));
-document.querySelector("#add").onclick=()=>addRow();
-
-document.querySelector("#analyze").onclick=()=>{
- document.querySelector("#fileStatus").textContent += " ／ 解析候補を生成しました。数量は図面と照合して確定してください。";
+function clearRows(){tbody.innerHTML=''}
+function setProgress(n,msg,kind){bar.style.width=n+'%';statusEl.textContent=msg;notice.className='notice '+(kind||'');}
+function updateSummary(){let q=0;[...tbody.querySelectorAll('tr')].forEach(tr=>{q+=Number(tr.querySelectorAll('input')[4]?.value)||0});$('qty').textContent=q;$('kinds').textContent=tbody.rows.length;$('checks').textContent=tbody.rows.length}
+function countText(text){const results=[];for(const p of patterns){const m=text.match(new RegExp(p.re.source,p.re.flags.includes('g')?'g':'gi'));if(m&&m.length)results.push({...p,count:m.length})}return results}
+async function extractPdf(file){
+ const buf=await file.arrayBuffer();
+ if(!window.pdfjsLib)throw new Error('PDF解析ライブラリを読み込めませんでした。通信環境またはGitHub Pagesの外部スクリプト読み込みを確認してください。');
+ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+ const pdf=await pdfjsLib.getDocument({data:buf}).promise;let text='';
+ for(let p=1;p<=pdf.numPages;p++){setProgress(Math.round((p/pdf.numPages)*55),`PDF解析中… ${p}/${pdf.numPages}ページ`);const page=await pdf.getPage(p);const tc=await page.getTextContent();text+='\n'+tc.items.map(x=>x.str).join(' ')}
+ return {text,pages:pdf.numPages};
+}
+async function extractImage(file){
+ if(!window.Tesseract)throw new Error('OCRライブラリを読み込めませんでした。通信環境を確認してください。');
+ setProgress(10,'画像OCRを準備中…');const worker=await Tesseract.createWorker('jpn');setProgress(30,'画像をOCR解析中…');const r=await worker.recognize(file);await worker.terminate();return {text:r.data.text,pages:1};
+}
+fileEl.addEventListener('change',()=>{const f=fileEl.files[0];if(!f){statusEl.textContent='ファイル未選択';return}$('drawing').value=f.name;setProgress(0,`選択: ${f.name}（${Math.round(f.size/1024)} KB）`,'ok');notice.textContent='アップロード完了。まだ解析は実行していません。下の「図面を解析する」を押してください。';});
+$('add').onclick=()=>{addRow();updateSummary()};
+analyzeBtn.onclick=async()=>{
+ const f=fileEl.files[0];if(!f){alert('先に図面PDFまたは画像を選択してください。');return}
+ analyzeBtn.disabled=true;busy.classList.add('show');clearRows();setProgress(3,'解析を開始しています…');
+ try{
+  const result=f.type==='application/pdf'?await extractPdf(f):await extractImage(f);setProgress(70,'電気設備の記号・名称を集計中…');
+  const hits=countText(result.text);if(!hits.length){addRow(['その他','','解析候補（要確認）','PDF/画像から候補を検出できませんでした','1','式'])}else hits.forEach(h=>addRow([h.cat,h.sym,h.name,'',h.count,h.unit]));
+  $('pages').textContent=result.pages;updateSummary();setProgress(100,`解析完了：${result.pages}ページ／${hits.length}種類の候補。数量は図面と照合してください。`,'ok');
+ }catch(e){console.error(e);setProgress(0,'解析に失敗しました。下記エラーを確認してください。','error');alert('解析エラー\n'+(e?.message||e));}
+ finally{analyzeBtn.disabled=false;busy.classList.remove('show')}
 };
-
-document.querySelector("#file").onchange=e=>{
- const f=e.target.files[0]; if(!f)return;
- document.querySelector("#fileStatus").textContent=`選択: ${f.name}（${Math.round(f.size/1024)} KB）`;
-};
-
-["material","labor","expense","tax"].forEach(id=>document.getElementById(id).oninput=()=>{
- const m=+material.value||0,l=+labor.value||0,e=+expense.value||0,t=+tax.value||0;
- total.textContent=`合計 ${Math.round((m+l+e)*(1+t/100)).toLocaleString()} 円`;
-});
-
-document.querySelector("#export").onclick=()=>{
- const rows=[...document.querySelectorAll("#tbl tbody tr")].map(tr=>{
-   const a=[...tr.querySelectorAll("input")].map(x=>x.value);
-   return {category:a[0],symbol:a[1],item_name:a[2],specification:a[3],quantity:a[4],unit:a[5],manufacturer:a[6],model_number:a[7],list_price:a[8],status:"needs_verification"};
- });
- const data={app:"株式会社J.style 拾い出しアプリ",project:{name:project.value,customer:customer.value,site:site.value,drawing:drawing.value},items:rows};
- const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
- const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="jstyle_pickup_result.json";a.click();
-};
+['material','labor','expense','tax'].forEach(id=>$(id).addEventListener('input',()=>{const m=+$('material').value||0,l=+$('labor').value||0,e=+$('expense').value||0,t=+$('tax').value||0;$('total').textContent=`合計 ${Math.round((m+l+e)*(1+t/100)).toLocaleString()} 円`}));
+function getRows(){return [...tbody.querySelectorAll('tr')].map(tr=>{const a=[...tr.querySelectorAll('input')].map(x=>x.value);return{category:a[0],symbol:a[1],item_name:a[2],specification:a[3],quantity:Number(a[4])||0,unit:a[5],manufacturer:a[6],model_number:a[7],list_price:Number(a[8])||0,status:'needs_verification'}})}
+function download(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+$('export').onclick=()=>download('jstyle_pickup_result.json',new Blob([JSON.stringify({app:'株式会社J.style 拾い出しアプリ',version:'5.0',project:{name:$('project').value,customer:$('customer').value,site:$('site').value,drawing:$('drawing').value},items:getRows()},null,2)],{type:'application/json'}));
+$('csv').onclick=()=>{const rows=getRows();const head=['区分','記号','品名','仕様','数量','単位','メーカー','型番/品番','定価','状態'];const body=rows.map(r=>[r.category,r.symbol,r.item_name,r.specification,r.quantity,r.unit,r.manufacturer,r.model_number,r.list_price,r.status]);const csv='\ufeff'+[head,...body].map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\n');download('jstyle_pickup_result.csv',new Blob([csv],{type:'text/csv;charset=utf-8'}))};
+updateSummary();
 </script>
 </body></html>
