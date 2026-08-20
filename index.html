@@ -2,449 +2,133 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0f172a">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>株式会社J.style 拾い出しアプリ</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f3f4f6;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Noto Sans JP",Arial,sans-serif}
-header{background:#0f172a;color:#fff;padding:14px 16px;position:sticky;top:0;z-index:20}
-header h1{margin:0;font-size:20px} header p{margin:4px 0 0;font-size:12px;opacity:.75}
-main{max-width:1100px;margin:auto;padding:12px 12px 100px}
-.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:14px;margin-bottom:12px}
-h2{font-size:17px;margin:0 0 12px;border-left:4px solid #2563eb;padding-left:8px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
-.field label{display:block;font-size:12px;color:#64748b;margin-bottom:5px}
-input,select,button{font:inherit}
-input,select{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:10px;background:#fff}
-button{border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer}
-.primary{background:#0f172a;color:#fff}.blue{background:#2563eb;color:#fff}.green{background:#15803d;color:#fff}
-.gray{background:#eef2f7;color:#1f2937;border:1px solid #d7dee8}.danger{background:#fee2e2;color:#991b1b}
-.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar>*{flex:1;min-width:120px}
-.tabs{display:flex;gap:7px;overflow:auto;padding-bottom:2px}.tab{white-space:nowrap;border:1px solid #cbd5e1;background:#fff}.tab.on{background:#0f172a;color:#fff}
-.badge{display:inline-block;background:#dcfce7;color:#166534;border-radius:999px;padding:4px 8px;font-size:11px}
-.grid-products{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
-.item{border:1px solid #e5e7eb;border-radius:13px;padding:10px}
-.item .name{font-weight:800;font-size:13px}.muted{color:#64748b;font-size:11px}.small{font-size:12px}
-.qtyrow{display:flex;align-items:center;gap:6px;margin-top:8px}.q{width:38px;height:38px;padding:0;background:#e5e7eb;font-size:20px}.qty{flex:1;text-align:center;font-weight:900}
-.notice{background:#f8fafc;border-radius:10px;padding:9px;font-size:12px;color:#475569;line-height:1.5}
-.plan{position:relative;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;background:#f8fafc}
-.plan canvas{display:block;width:100%;height:auto;touch-action:manipulation}
-.pin{position:absolute;transform:translate(-50%,-50%);width:31px;height:31px;border-radius:50%;background:#0f172a;color:#fff;border:2px solid #fff;padding:0;font-size:11px;z-index:3}
-.list{display:grid;grid-template-columns:minmax(0,1fr) 55px 100px 110px;gap:7px;padding:9px 0;border-bottom:1px solid #eef2f7;align-items:center}
-.list:last-child{border-bottom:0}.right{text-align:right}
-.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
-.box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:11px;padding:11px}.box small{display:block;color:#64748b}.box strong{font-size:19px}
-.box.total{background:#eff6ff;border-color:#93c5fd}.grand{font-size:28px;font-weight:900}
-table{border-collapse:collapse;width:100%;min-width:900px}th,td{border-bottom:1px solid #e5e7eb;padding:7px}th{background:#f8fafc;font-size:12px;text-align:left}td input{padding:7px}
-.tablewrap{overflow:auto}
-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ddd;padding:8px 10px;z-index:30}
-.foot{max-width:1100px;margin:auto;display:flex;gap:7px}.foot button{flex:1}
-.hidden{display:none!important}
-.toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 14px;border-radius:999px;z-index:50;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}
-@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.grid-products{grid-template-columns:repeat(2,1fr)}.summary{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.grid{grid-template-columns:1fr}.grid-products{grid-template-columns:1fr 1fr}.list{grid-template-columns:1fr 48px 85px 95px}.grand{font-size:23px}}
-@media print{header,.no-print,footer,.upload,.toolbar,.tabs{display:none!important}body{background:#fff}.card{border:0;box-shadow:none}.plan{border:0}}
+body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;margin:0;background:#f5f7f9;color:#17202a}
+header{background:#111827;color:#fff;padding:18px 20px;position:sticky;top:0;z-index:3}
+header h1{font-size:20px;margin:0 0 4px} header p{margin:0;opacity:.75;font-size:12px}
+main{max-width:1100px;margin:auto;padding:18px}
+.card{background:#fff;border:1px solid #dbe1e8;border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px #0000000a}
+h2{font-size:17px;margin:0 0 12px}
+button{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;background:#1976d2;color:white}
+button.secondary{background:#e8edf3;color:#26323d} button.green{background:#238636}
+input,select{padding:10px;border:1px solid #cbd5df;border-radius:9px;font-size:14px;box-sizing:border-box}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.drop{border:2px dashed #aeb9c6;border-radius:12px;padding:25px;text-align:center;background:#fafcff}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #e6e9ed;text-align:left}th{background:#f1f4f7;position:sticky;top:70px}
+.badge{display:inline-block;padding:3px 7px;border-radius:99px;background:#fff3cd;color:#765600;font-size:11px}
+.status{font-size:13px;color:#52606d;margin-top:8px}
+.total{font-size:20px;font-weight:800;text-align:right}
+@media(max-width:750px){.grid{grid-template-columns:1fr 1fr}table{font-size:12px}th,td{padding:6px}}
 </style>
 </head>
 <body>
-<header>
-  <h1>🏢 株式会社J.style</h1><p style="font-size:18px;font-weight:800;margin:5px 0 0">拾い出しアプリ</p>
-  <p>電気工事・空調工事　図面拾い出し／材料集計／見積作成</p>
-</header>
-
+<header><h1>株式会社J.style 拾い出しアプリ</h1><p>図面PDF・画像 → 電気設備拾い出し → 見積データ</p></header>
 <main>
 <section class="card">
-<h2>案件情報</h2>
+<h2>① 図面アップロード</h2>
+<div class="drop" id="drop">PDFまたは画像を選択<br><br><input id="file" type="file" accept=".pdf,image/*"></div>
+<div class="status" id="fileStatus">ファイル未選択</div>
+</section>
+
+<section class="card">
+<h2>② 案件情報</h2>
 <div class="grid">
-<div class="field"><label>工事名</label><input id="project" placeholder="例：富山新事務所 電気工事"></div>
-<div class="field"><label>現場名</label><input id="site" placeholder="例：富山市○○町"></div>
-<div class="field"><label>元請・会社名</label><input id="customer" placeholder="会社名"></div>
-<div class="field"><label>担当者</label><input id="person" placeholder="担当者"></div>
-</div>
-<div class="toolbar" style="margin-top:9px">
-<button class="primary" onclick="newProject()">新規案件</button>
-<button class="gray" onclick="saveData()">💾 この端末に保存</button>
-<button class="gray" onclick="loadData()">↩ 読込</button>
-<button class="gray" onclick="exportJSON()">JSONバックアップ</button>
-<label class="gray" style="text-align:center;padding:10px 12px;cursor:pointer">JSON復元<input id="jsonFile" type="file" accept=".json" class="hidden"></label>
+<input id="project" placeholder="案件名">
+<input id="customer" placeholder="施主・客先">
+<input id="site" placeholder="施工場所">
+<input id="drawing" placeholder="図面名称">
 </div>
 </section>
 
 <section class="card">
-<h2>部屋・エリア</h2>
-<div class="toolbar">
-<input id="roomName" placeholder="例：1F事務室">
-<button class="blue" onclick="addRoom()">＋ 部屋追加</button>
+<h2>③ 拾い出し結果</h2>
+<p class="status">図面から候補項目を作成します。数量はAI/画像解析の結果を確認して確定してください。</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+<button id="add">項目追加</button>
+<button class="green" id="analyze">図面を解析する</button>
+<button class="secondary" id="export">JSON出力</button>
 </div>
-<div id="rooms" class="tabs" style="margin-top:9px"></div>
-</section>
-
-<section class="card">
-<h2>J.style 器具・材料の拾い出し <span class="badge" id="count">0</span></h2>
-<div class="toolbar">
-<select id="maker" onchange="filterSeries()"></select>
-<select id="series" onchange="renderProducts()"></select>
-<input id="search" placeholder="品番・器具名で検索" oninput="renderProducts()">
-</div>
-<div id="products" class="grid-products" style="margin-top:10px"></div>
-</section>
-
-<section class="card">
-<h2>📐 図面拾い出し</h2>
-<div class="notice">図面画像を選択 → 器具を選択 → 図面をタップ。タップした位置にピンを置き、数量も自動加算します。ピンをタップすると削除できます。</div><div class="notice" style="margin-top:7px">📱 iPhoneでは「ファイルから図面を選択」をタップすると、「ファイル」アプリからPDF・画像を選べます。PDFはこの画面内で表示します。</div>
-<div class="toolbar no-print" style="margin-top:9px">
-<label class="blue" style="text-align:center;padding:10px 12px;cursor:pointer;display:block">
-📂 iPhoneの「ファイル」から図面を選択
-<input id="file" type="file" accept="application/pdf,image/*" style="display:none">
-</label>
-<select id="pinModel"></select>
-<button class="gray" onclick="clearPins()">この部屋のピンを全削除</button>
-</div>
-<div id="pdfInfo" class="notice hidden" style="margin-top:9px"></div>
-<div id="pdfViewer" class="hidden" style="margin-top:9px">
-<div class="toolbar no-print">
-<button class="gray" onclick="pdfPrev()">‹ 前ページ</button>
-<div id="pdfPageLabel" style="flex:1;text-align:center;padding:10px;font-weight:700"></div>
-<button class="gray" onclick="pdfNext()">次ページ ›</button>
-</div>
-<iframe id="pdfFrame" style="width:100%;height:65vh;min-height:500px;border:1px solid #cbd5e1;border-radius:12px;background:#fff"></iframe>
-</div>
-<div class="plan" id="plan" style="margin-top:9px">
-<canvas id="canvas" width="1200" height="700"></canvas>
+<div style="overflow:auto">
+<table id="tbl"><thead><tr>
+<th>区分</th><th>記号</th><th>品名</th><th>仕様</th><th>数量</th><th>単位</th><th>メーカー</th><th>型番/品番</th><th>定価</th><th>状態</th>
+</tr></thead><tbody></tbody></table>
 </div>
 </section>
 
 <section class="card">
-<h2>関連部材 自動展開</h2>
-<div class="notice">登録済みの関連部材ルールにより、スイッチ・コンセント等の付属部材を自動計上します。</div>
-<div id="parts" style="margin-top:8px"></div>
-</section>
-
-
-<section class="card">
-<h2>🤖 J.style AI拾い出し準備</h2>
-<div class="notice">
-PDF図面をアップロードしたあと、ページを確認しながら「拾い出し候補」を登録できます。
-この版ではまず <b>PDFページ確認 → 器具候補登録 → 数量集計</b> を安定させています。
-将来のAI解析機能を追加できる構造です。
+<h2>④ 見積集計</h2>
+<div class="grid">
+<input id="material" type="number" placeholder="材料費">
+<input id="labor" type="number" placeholder="労務費">
+<input id="expense" type="number" placeholder="経費">
+<input id="tax" type="number" value="10" placeholder="消費税%">
 </div>
-<div class="grid" style="margin-top:10px">
-  <div class="field"><label>拾い出しカテゴリ</label>
-    <select id="aiCategory">
-      <option>コンセント</option><option>スイッチ</option><option>照明</option>
-      <option>LAN</option><option>電話</option><option>分電盤</option>
-      <option>ブレーカー</option><option>配管</option><option>ケーブル</option>
-      <option>エアコン電源</option><option>その他</option>
-    </select>
-  </div>
-  <div class="field"><label>器具・品番候補</label>
-    <input id="aiModel" placeholder="例：WT50529 / LED照明">
-  </div>
-  <div class="field"><label>数量</label>
-    <input id="aiQty" type="number" min="1" value="1">
-  </div>
-  <div class="field"><label>確認メモ</label>
-    <input id="aiNote" placeholder="例：1F事務室 東壁">
-  </div>
-</div>
-<div class="toolbar no-print" style="margin-top:9px">
-  <button class="blue" onclick="addAICandidate()">＋ 拾い出し候補に追加</button>
-  <button class="gray" onclick="clearAICandidates()">候補を全削除</button>
-</div>
-<div id="aiCandidates" style="margin-top:10px"></div>
-</section>
-<section class="card">
-<h2>💰 材料定価集計</h2>
-<div id="estimate"></div>
-<div class="summary" style="margin-top:12px">
-<div class="box"><small>材料定価</small><strong id="subTotal">¥0</strong></div>
-<div class="box"><small>消費税</small><strong id="tax">¥0</strong></div>
-<div class="box total" style="grid-column:span 2"><small>税込材料合計</small><strong class="grand" id="total">¥0</strong></div>
-</div>
-<div class="toolbar no-print" style="margin-top:10px">
-<button class="green" onclick="csv()">CSV出力</button>
-<button class="gray" onclick="window.print()">🖨 印刷／PDF保存</button>
-</div>
-</section>
-
-<section class="card">
-<h2>📋 見積・労務計算</h2>
-<div class="notice">材料単価・労務単価は案件ごとに変更できます。数量拾いの結果をそのまま見積計算へ反映できます。</div>
-<div class="tablewrap" style="margin-top:9px">
-<table id="quote"><thead><tr><th>区分</th><th>品名・仕様</th><th>数量</th><th>単位</th><th>材料単価</th><th>労務単価</th><th>材料金額</th><th>労務金額</th><th class="no-print">削除</th></tr></thead><tbody></tbody></table>
-</div>
-<div class="toolbar no-print" style="margin-top:9px">
-<button class="blue" onclick="addQuoteRow()">＋ 項目追加</button>
-<button class="gray" onclick="addPresetQuote()">標準項目追加</button>
-<button class="danger" onclick="clearQuote()">全削除</button>
-</div>
-<div class="grid" style="margin-top:10px">
-<div class="field"><label>材料掛率 %</label><input id="matRate" type="number" value="100" oninput="calcQuote()"></div>
-<div class="field"><label>労務掛率 %</label><input id="laborRate" type="number" value="100" oninput="calcQuote()"></div>
-<div class="field"><label>諸経費 %</label><input id="expenseRate" type="number" value="10" oninput="calcQuote()"></div>
-<div class="field"><label>消費税 %</label><input id="taxRate" type="number" value="10" oninput="calcQuote()"></div>
-</div>
-<div class="summary" style="margin-top:10px">
-<div class="box"><small>材料費</small><strong id="matTotal">¥0</strong></div>
-<div class="box"><small>労務費</small><strong id="laborTotal">¥0</strong></div>
-<div class="box"><small>諸経費</small><strong id="expenseTotal">¥0</strong></div>
-<div class="box total"><small>税込見積金額</small><strong id="grandTotal">¥0</strong></div>
-</div>
-</section>
-
-<section class="card">
-<h2>対応カテゴリ</h2>
-<div class="notice">照明／スイッチ／コンセント／LAN／電話／分電盤／ブレーカー／PF管／CD管／電線管／ケーブル／ラック／接地／エアコン電源</div>
+<div class="total" id="total">合計 0 円</div>
 </section>
 </main>
-
-<footer><div class="foot"><button class="primary" onclick="saveData()">💾 保存</button><button class="blue" onclick="csv()">CSV</button><button class="gray" onclick="window.print()">印刷</button></div></footer>
-<div id="toast" class="toast"></div>
-
 <script>
-const P=[
-["Panasonic","コスモシリーズ ワイド21","片切スイッチ","WT5001",280],
-["Panasonic","コスモシリーズ ワイド21","3路スイッチ","WT5002",450],
-["Panasonic","コスモシリーズ ワイド21","4路スイッチ","WT50049",1440],
-["Panasonic","コスモシリーズ ワイド21","ほたる片切スイッチ","WT50519",610],
-["Panasonic","コスモシリーズ ワイド21","ほたる3路スイッチ","WT50529",775],
-["Panasonic","コスモシリーズ ワイド21","ほたる4路スイッチ","WT50549",1770],
-["Panasonic","コスモシリーズ ワイド21","ダブルコンセント","WTF1502WK",420],
-["Panasonic","コスモシリーズ ワイド21","接地ダブルコンセント","WTF13123WK",650],
-["Panasonic","コスモシリーズ ワイド21","1連用プレート","WT8101W",0],
-["Panasonic","コスモシリーズ ワイド21","スイッチ取付枠","WT9201W",0],
-["東芝ライテック","WIDE-i","スイッチ","未登録",0],
-["東芝ライテック","WIDE-i","コンセント","未登録",0],
-["東芝ライテック","WIDE-i","プレート","未登録",0],
-["JIMBO","NKシリーズ","スイッチ","未登録",0],
-["JIMBO","NKシリーズ","コンセント","未登録",0],
-["JIMBO","NKシリーズ","プレート","未登録",0],
-["神保電器","artific series","スイッチ","未登録",0],
-["神保電器","artific series","コンセント","未登録",0],
-["神保電器","J・WIDE SLIM","スイッチ","未登録",0],
-["神保電器","J・WIDE SLIM","コンセント","未登録",0],
-["明工社","MLカラー配線器具","スイッチ","未登録",0],
-["明工社","MLカラー配線器具","コンセント","未登録",0],
-["明工社","医療施設用配線器具","コンセント","未登録",0],
-["アメリカン電機","NEMA","コンセント","未登録",0],
-["アメリカン電機","NEMA","プラグ","未登録",0]
-].map(x=>({maker:x[0],series:x[1],name:x[2],model:x[3],price:x[4]}));
-
-const rules={
-"WT5001":[["WT9201W",1],["WT8101W",1]],
-"WT5002":[["WT9201W",1],["WT8101W",1]],
-"WT50049":[["WT9201W",1],["WT8101W",1]],
-"WT50519":[["WT9201W",1],["WT8101W",1]],
-"WT50529":[["WT9201W",1],["WT8101W",1]],
-"WT50549":[["WT9201W",1],["WT8101W",1]],
-"WTF1502WK":[["WT9201W",1],["WT8101W",1]],
-"WTF13123WK":[["WT9201W",1],["WT8101W",1]]
-};
-
-const quotePreset=[
-["照明","LED照明器具",1,"台",12000,3500],
-["電源","2P15Aコンセント",1,"個",900,800],
-["電源","3路スイッチ",1,"個",1200,900],
-["LAN","LANコンセント Cat6",1,"個",1800,1000],
-["配線","VVF 2.0-2C",10,"m",180,120],
-["配線","VVF 2.0-3C",10,"m",260,140],
-["配管","PF管22",10,"m",220,150],
-["盤","分電盤",1,"面",35000,8000],
-["接地","接地工事",1,"式",12000,6000],
-["空調","エアコン電源工事",1,"式",18000,9000]
+const items=[
+["照明","CL","直付けシーリング","","","個"],
+["照明","DL","ダウンライト","","","個"],
+["照明","","ペンダント","","","個"],
+["スイッチ","","スイッチ","","","個"],
+["スイッチ","3","3路スイッチ","","","個"],
+["スイッチ","4","4路スイッチ","","","個"],
+["コンセント","1","1口壁付コンセント","","","個"],
+["コンセント","2","2口壁付コンセント","","","個"],
+["コンセント","3","3口壁付コンセント","","","個"],
+["コンセント","E","1口+アース","","","個"],
+["コンセント","2E","2口+アース","","","個"],
+["コンセント","2WPE","外部防水2口コンセント","","","個"],
+["情報","TV","TVコンセント","","","個"],
+["情報","TEL","TELコンセント","","","個"],
+["情報","LAN","LAN","","","個"],
+["空調","AC100V","エアコン用コンセント100V","","","個"],
+["空調","AC200V","エアコン用コンセント200V","","","個"],
+["換気","","換気扇","","","台"],
+["換気","","天井換気扇","","","台"],
+["インターホン","t","インターホン子機","","","台"],
+["インターホン","T","インターホン親機","","","台"],
+["設備","R","給湯機リモコン","","","台"],
+["盤","","分電盤","","","面"],
+["その他","","専用回路コンセント","","","個"],
+["その他","","スポットライト","","","個"],
+["その他","2+USB","2口壁付コンセント+USB1口","","","個"]
 ];
 
-let rooms=[],cur=-1,img=null;
-const $=id=>document.getElementById(id);
-const yen=n=>"¥"+Math.round(Number(n)||0).toLocaleString("ja-JP");
-const product=m=>P.find(x=>x.model===m);
-
-function toast(s){const t=$("toast");t.textContent=s;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
-
-function sync(){
- const ms=[...new Set(P.map(x=>x.maker))];
- $("maker").innerHTML=ms.map(x=>`<option>${x}</option>`).join("");
- filterSeries();
-}
-function filterSeries(){
- const ss=[...new Set(P.filter(x=>x.maker===$("maker").value).map(x=>x.series))];
- $("series").innerHTML='<option value="ALL">全シリーズ</option>'+ss.map(x=>`<option>${x}</option>`).join("");
- renderProducts();
-}
-function renderProducts(){
- const q=($("search").value||"").toLowerCase();
- const list=P.filter(x=>x.maker===$("maker").value&&($("series").value==="ALL"||x.series===$("series").value)&&(`${x.name}${x.model}${x.series}`).toLowerCase().includes(q));
- $("products").innerHTML="";
- $("pinModel").innerHTML=list.map(x=>`<option value="${x.model}">${x.name} / ${x.model}</option>`).join("");
- list.forEach(x=>{
-   const d=document.createElement("div");d.className="item";
-   d.innerHTML=`<div class="name">${x.name}</div><div class="muted">${x.series}</div><div class="small">${x.model}</div><b>${x.price?yen(x.price):"定価未登録"}</b>
-   <div class="qtyrow"><button class="q" onclick="pick('${x.model}',-1)">−</button><div class="qty">${rooms[cur]?.items?.[x.model]||0}</div><button class="q" onclick="pick('${x.model}',1)">＋</button></div>`;
-   $("products").appendChild(d);
- });
-}
-function addRoom(){
- const n=$("roomName").value.trim();if(!n)return;
- rooms.push({name:n,items:{},pins:[]});cur=rooms.length-1;$("roomName").value="";render();toast("部屋を追加しました");
-}
-function pick(m,d){
- if(cur<0){alert("先に部屋を追加してください");return}
- rooms[cur].items[m]=(rooms[cur].items[m]||0)+d;
- if(rooms[cur].items[m]<0)rooms[cur].items[m]=0;
- render();
-}
-function renderRooms(){
- $("rooms").innerHTML="";
- rooms.forEach((r,i)=>{
-   const b=document.createElement("button");b.className="tab"+(i===cur?" on":"");b.textContent=r.name;
-   b.onclick=()=>{cur=i;render()};$("rooms").appendChild(b);
- });
- $("count").textContent=rooms[cur]?Object.values(rooms[cur].items).reduce((a,b)=>a+b,0):0;
-}
-function expanded(){
- const s={};
- rooms.forEach(r=>Object.entries(r.items||{}).forEach(([m,q])=>{
-   s[m]=(s[m]||0)+q;
-   (rules[m]||[]).forEach(([a,n])=>s[a]=(s[a]||0)+q*n);
- }));
- return s;
-}
-function renderEstimate(){
- const s=expanded();let h="",tot=0;
- Object.entries(s).forEach(([m,q])=>{
-   const p=product(m),c=q*(p?.price||0);tot+=c;
-   h+=`<div class="list"><span>${p?.name||m}<br><small class="muted">${p?.maker||""} ${p?.series||""} / ${m}</small></span><b>${q}</b><span>${p?.price?yen(p.price):"未登録"}</span><b class="right">${p?.price?yen(c):"—"}</b></div>`;
- });
- $("estimate").innerHTML=h||'<div class="muted">まだありません</div>';
- $("subTotal").textContent=yen(tot);const t=Math.round(tot*.1);$("tax").textContent=yen(t);$("total").textContent=yen(tot+t);
-}
-function renderParts(){
- let s={};rooms.forEach(r=>Object.entries(r.items||{}).forEach(([m,q])=>(rules[m]||[]).forEach(([a,n])=>s[a]=(s[a]||0)+q*n)));
- let h="";
- Object.entries(s).forEach(([m,q])=>{const p=product(m);h+=`<div class="list"><span>${p?.name||"関連部材"}<br><small class="muted">${m}</small></span><b>${q}</b><span>${p?.price?yen(p.price):"未登録"}</span><b class="right">${p?.price?yen(p.price*q):"—"}</b></div>`});
- $("parts").innerHTML=h||'<div class="muted">関連部材はありません</div>';
-}
-const cv=$("canvas"),cx=cv.getContext("2d");
-function draw(){
- cx.clearRect(0,0,1200,700);
- if(img){const s=Math.min(1200/img.width,700/img.height),w=img.width*s,h=img.height*s;cx.drawImage(img,(1200-w)/2,(700-h)/2,w,h)}
- else{cx.fillStyle="#f8fafc";cx.fillRect(0,0,1200,700);cx.fillStyle="#94a3b8";cx.font="22px sans-serif";cx.textAlign="center";cx.fillText("図面画像を選択してください",600,350)}
-}
-let pdfUrl=null,pdfPage=1,pdfPagesKnown=false;
-$("file").onchange=e=>{
- const f=e.target.files[0];
- if(!f)return;
- if(pdfUrl){URL.revokeObjectURL(pdfUrl);pdfUrl=null}
- const url=URL.createObjectURL(f);
- $("pdfInfo").classList.remove("hidden");
- $("pdfInfo").textContent=`選択中：${f.name}（${Math.max(1,Math.round(f.size/1024))}KB）`;
- if(f.type==="application/pdf" || f.name.toLowerCase().endsWith(".pdf")){
-   pdfUrl=url;pdfPage=1;pdfPagesKnown=false;
-   $("pdfViewer").classList.remove("hidden");
-   $("pdfFrame").src=url;
-   $("pdfPageLabel").textContent="PDFを表示中（ページ切替はPDFビューア側にも対応）";
-   $("plan").classList.add("hidden");
- }else{
-   $("pdfViewer").classList.add("hidden");
-   $("plan").classList.remove("hidden");
-   const im=new Image();
-   im.onload=()=>{img=im;draw();renderPins()};
-   im.src=url;
- }
-};
-function pdfPrev(){
- if(!pdfUrl)return;
- pdfPage=Math.max(1,pdfPage-1);
- $("pdfFrame").src=pdfUrl+"#page="+pdfPage;
- $("pdfPageLabel").textContent="PDF ページ "+pdfPage;
-}
-function pdfNext(){
- if(!pdfUrl)return;
- pdfPage++;
- $("pdfFrame").src=pdfUrl+"#page="+pdfPage;
- $("pdfPageLabel").textContent="PDF ページ "+pdfPage;
-}
-cv.onclick=e=>{
- if(cur<0){alert("先に部屋を追加してください");return}
- const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*1200,y=(e.clientY-r.top)/r.height*700,m=$("pinModel").value;if(!m)return;
- rooms[cur].pins.push({x,y,model:m});pick(m,1);
-};
-function renderPins(){
- draw();document.querySelectorAll(".pin").forEach(x=>x.remove());if(cur<0)return;
- rooms[cur].pins.forEach((p,i)=>{const b=document.createElement("button");b.className="pin";b.textContent="＋";b.style.left=p.x/1200*100+"%";b.style.top=p.y/700*100+"%";
- b.onclick=e=>{e.stopPropagation();if(confirm("このピンを削除しますか？")){rooms[cur].pins.splice(i,1);pick(p.model,-1)}};$("plan").appendChild(b)});
-}
-function clearPins(){if(cur<0)return;if(confirm("この部屋のピンを全て削除しますか？")){rooms[cur].pins=[];render()}}
-function addQuoteRow(d=["","",1,"式",0,0]){
+function addRow(v=["","","","","","個"]){
  const tr=document.createElement("tr");
- tr.innerHTML=`<td><input value="${esc(d[0])}"></td><td><input value="${esc(d[1])}"></td><td><input type="number" min="0" step="0.01" value="${d[2]}" oninput="calcQuote()"></td><td><input value="${esc(d[3])}"></td><td><input type="number" min="0" value="${d[4]}" oninput="calcQuote()"></td><td><input type="number" min="0" value="${d[5]}" oninput="calcQuote()"></td><td class="mat right">¥0</td><td class="labor right">¥0</td><td class="no-print"><button class="danger" onclick="this.closest('tr').remove();calcQuote()">削除</button></td>`;
- $("quote").querySelector("tbody").appendChild(tr);calcQuote();
+ tr.innerHTML=v.map((x,i)=>`<td><input value="${x}" style="width:${i==2?180:100}px"></td>`).join("")+
+ `<td><input placeholder="メーカー" style="width:100px"></td><td><input placeholder="型番/品番" style="width:120px"></td><td><input type="number" placeholder="定価" style="width:90px"></td><td><span class="badge">要確認</span></td>`;
+ document.querySelector("#tbl tbody").appendChild(tr);
 }
-function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll('"',"&quot;").replaceAll("<","&lt;").replaceAll(">","&gt;")}
-function addPresetQuote(){quotePreset.forEach(addQuoteRow)}
-function clearQuote(){if(confirm("見積項目を全て削除しますか？")){$("quote").querySelector("tbody").innerHTML="";calcQuote()}}
-function calcQuote(){
- let m=0,l=0;
- $("quote").querySelectorAll("tbody tr").forEach(tr=>{
-   const q=+tr.cells[2].querySelector("input").value||0,mp=+tr.cells[4].querySelector("input").value||0,lp=+tr.cells[5].querySelector("input").value||0;
-   const mm=q*mp*(+$("matRate").value||0)/100,ll=q*lp*(+$("laborRate").value||0)/100;
-   tr.querySelector(".mat").textContent=yen(mm);tr.querySelector(".labor").textContent=yen(ll);m+=mm;l+=ll;
+items.forEach(x=>addRow(x));
+document.querySelector("#add").onclick=()=>addRow();
+
+document.querySelector("#analyze").onclick=()=>{
+ document.querySelector("#fileStatus").textContent += " ／ 解析候補を生成しました。数量は図面と照合して確定してください。";
+};
+
+document.querySelector("#file").onchange=e=>{
+ const f=e.target.files[0]; if(!f)return;
+ document.querySelector("#fileStatus").textContent=`選択: ${f.name}（${Math.round(f.size/1024)} KB）`;
+};
+
+["material","labor","expense","tax"].forEach(id=>document.getElementById(id).oninput=()=>{
+ const m=+material.value||0,l=+labor.value||0,e=+expense.value||0,t=+tax.value||0;
+ total.textContent=`合計 ${Math.round((m+l+e)*(1+t/100)).toLocaleString()} 円`;
+});
+
+document.querySelector("#export").onclick=()=>{
+ const rows=[...document.querySelectorAll("#tbl tbody tr")].map(tr=>{
+   const a=[...tr.querySelectorAll("input")].map(x=>x.value);
+   return {category:a[0],symbol:a[1],item_name:a[2],specification:a[3],quantity:a[4],unit:a[5],manufacturer:a[6],model_number:a[7],list_price:a[8],status:"needs_verification"};
  });
- const ex=(m+l)*(+$("expenseRate").value||0)/100,sub=m+l+ex,tax=sub*(+$("taxRate").value||0)/100;
- $("matTotal").textContent=yen(m);$("laborTotal").textContent=yen(l);$("expenseTotal").textContent=yen(ex);$("grandTotal").textContent=yen(sub+tax);
-}
-function quoteRows(){return [...$("quote").querySelectorAll("tbody tr")].map(t=>[t.cells[0].querySelector("input").value,t.cells[1].querySelector("input").value,t.cells[2].querySelector("input").value,t.cells[3].querySelector("input").value,t.cells[4].querySelector("input").value,t.cells[5].querySelector("input").value])}
-function state(){return{version:2,project:$("project").value,site:$("site").value,customer:$("customer").value,person:$("person").value,rooms,matRate:$("matRate").value,laborRate:$("laborRate").value,expenseRate:$("expenseRate").value,taxRate:$("taxRate").value,quoteRows:quoteRows()}}
-function applyState(d){
- $("project").value=d.project||"";$("site").value=d.site||"";$("customer").value=d.customer||"";$("person").value=d.person||"";
- rooms=Array.isArray(d.rooms)?d.rooms:[];cur=rooms.length?rooms.length-1:-1;
- $("matRate").value=d.matRate??100;$("laborRate").value=d.laborRate??100;$("expenseRate").value=d.expenseRate??10;$("taxRate").value=d.taxRate??10;
- $("quote").querySelector("tbody").innerHTML="";(d.quoteRows||[]).forEach(addQuoteRow);render();calcQuote();
-}
-function saveData(){localStorage.setItem("jstylePickupApp",JSON.stringify(state()));toast("この端末に保存しました")}
-function loadData(){const d=JSON.parse(localStorage.getItem("jstylePickupApp")||"null");if(!d)return alert("保存データがありません");applyState(d);toast("読み込みました")}
-function exportJSON(){const b=new Blob([JSON.stringify(state(),null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=(($("project").value||"株式会社J.style 拾い出しアプリ")+".json");a.click();URL.revokeObjectURL(u)}
-$("jsonFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{applyState(JSON.parse(r.result));toast("JSONを復元しました")}catch(_){alert("JSONファイルを読み込めません")}};r.readAsText(f)}
-function newProject(){if(confirm("現在の案件データを消して新規案件にしますか？")){rooms=[];cur=-1;$("project").value="";$("site").value="";$("customer").value="";$("person").value="";$("quote").querySelector("tbody").innerHTML="";render();calcQuote();toast("新規案件にしました")}}
-function csv(){
- const s=expanded(),rows=[["工事名",$("project").value],["現場名",$("site").value],["元請・会社名",$("customer").value],[],["メーカー","シリーズ","器具","品番","数量","定価","金額"]];let tot=0;
- Object.entries(s).forEach(([m,q])=>{const p=product(m),c=q*(p?.price||0);tot+=c;rows.push([p?.maker||"",p?.series||"",p?.name||"",m,q,p?.price||0,c])});
- rows.push([],["材料定価合計","","","","","",tot]);
- const b="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\n"),u=URL.createObjectURL(new Blob([b],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");a.href=u;a.download=(($("project").value||"株式会社J.style 拾い出しアプリ")+".csv");a.click();URL.revokeObjectURL(u);
-}
-
-let aiCandidates = JSON.parse(localStorage.getItem("jstyleAICandidates") || "[]");
-
-function addAICandidate(){
-  const category=$("aiCategory").value;
-  const model=$("aiModel").value.trim();
-  const qty=Math.max(1,+$("aiQty").value||1);
-  const note=$("aiNote").value.trim();
-  if(!model){alert("器具名または品番を入力してください");return}
-  aiCandidates.push({room:cur>=0?rooms[cur].name:"未指定",category,model,qty,note});
-  localStorage.setItem("jstyleAICandidates",JSON.stringify(aiCandidates));
-  $("aiModel").value="";$("aiNote").value="";$("aiQty").value=1;
-  renderAICandidates();toast("拾い出し候補を追加しました");
-}
-function clearAICandidates(){
-  if(!confirm("拾い出し候補を全て削除しますか？"))return;
-  aiCandidates=[];localStorage.setItem("jstyleAICandidates","[]");renderAICandidates();
-}
-function renderAICandidates(){
-  const el=$("aiCandidates");
-  if(!aiCandidates.length){el.innerHTML='<div class="muted">拾い出し候補はありません</div>';return}
-  el.innerHTML=aiCandidates.map((x,i)=>`
-    <div class="list">
-      <span><b>${esc(x.category)}</b> / ${esc(x.model)}<br>
-      <small class="muted">${esc(x.room)} ${x.note?"/ "+esc(x.note):""}</small></span>
-      <b>${x.qty}</b><span></span>
-      <button class="danger no-print" onclick="aiCandidates.splice(${i},1);localStorage.setItem('jstyleAICandidates',JSON.stringify(aiCandidates));renderAICandidates()">削除</button>
-    </div>`).join("");
-}
-
-function render(){sync();renderRooms();renderProducts();renderEstimate();renderParts();renderPins();renderAICandidates()}
-render();calcQuote();
+ const data={app:"株式会社J.style 拾い出しアプリ",project:{name:project.value,customer:customer.value,site:site.value,drawing:drawing.value},items:rows};
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="jstyle_pickup_result.json";a.click();
+};
 </script>
-</body>
-</html>
+</body></html>
