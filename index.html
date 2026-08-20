@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1020">
-<title>株式会社J.style 拾い出しアプリ Ver.6</title>
+<title>株式会社J.style 拾い出しアプリ Ver.7</title>
 <style>
 :root{--bg:#080d18;--panel:#101725;--text:#f4f7fb;--muted:#8f9caf;--line:#27344b}
 *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#080d18,#0b1220 55%,#080d18);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}
@@ -24,11 +24,20 @@ input{width:100%;background:#090f1b;color:var(--text);border:1px solid #2b3a54;b
 .qty{display:flex;gap:8px;align-items:center;padding:6px 0 10px}.qty button{width:38px;height:38px;border-radius:10px;background:#1b293e}.qty input{width:70px;text-align:center;padding:9px}
 footer{padding:10px 14px 30px;text-align:center;color:var(--muted);font-size:11px}
 @media(max-width:520px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.kpi:last-child{grid-column:1/-1}}
+
+.roombar{display:flex;gap:8px;align-items:center;margin-bottom:10px}.roombar select{flex:1}
+.room-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}.room-card{background:#0b1220;border:1px solid #26334a;border-radius:12px;padding:10px;cursor:pointer}
+.room-card.active{border-color:#5bb86d;background:#13251a}.room-card b{display:block}.room-card .room-meta{font-size:11px;color:var(--muted);margin-top:3px}
+.room-add{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}
+.group-title{display:flex;justify-content:space-between;align-items:center;padding:10px 0 6px;border-bottom:1px solid #26334a;margin-top:8px}
+.group-title b{font-size:14px}.group-title span{font-size:11px;color:var(--muted)}
+.empty-room{padding:12px 0;color:var(--muted);font-size:12px}
+@media(max-width:520px){.room-list{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="app">
-<header><div class="top"><h1>株式会社J.style 拾い出し</h1><span class="badge">Ver.6</span></div></header>
+<header><div class="top"><h1>株式会社J.style 拾い出し</h1><span class="badge">Ver.7</span></div></header>
 <main>
 <section class="card">
 <h2>① 案件情報</h2>
@@ -40,8 +49,23 @@ footer{padding:10px 14px 30px;text-align:center;color:var(--muted);font-size:11p
 </div>
 </section>
 
+
 <section class="card">
-<h2>② 商品マスター</h2>
+<h2>② 部屋・場所</h2>
+<div class="roombar">
+<select id="roomSelect"></select>
+<button class="secondary" onclick="selectRoomFromDropdown()">選択</button>
+</div>
+<div id="roomList" class="room-list"></div>
+<div class="room-add">
+<input id="roomName" placeholder="例：1階 事務室">
+<button class="primary" onclick="addRoom()">部屋追加</button>
+</div>
+<div class="note" style="margin-top:8px">部屋を選択してから商品を「使う」と、その部屋の拾い出しとして登録されます。</div>
+</section>
+
+<section class="card">
+<h2>③ 商品マスター</h2>
 <div class="tabs" id="seriesTabs"></div>
 <div style="height:8px"></div>
 <input id="search" placeholder="商品名・型番で検索">
@@ -49,7 +73,7 @@ footer{padding:10px 14px 30px;text-align:center;color:var(--muted);font-size:11p
 </section>
 
 <section class="card">
-<h2>③ 拾い出し結果</h2>
+<h2>④ 拾い出し結果</h2>
 <div class="kpis">
 <div class="kpi">登録品目<b id="count">0</b></div>
 <div class="kpi">総数量<b id="qty">0</b></div>
@@ -63,11 +87,11 @@ footer{padding:10px 14px 30px;text-align:center;color:var(--muted);font-size:11p
 </section>
 
 <section class="card">
-<h2>④ 仕様</h2>
+<h2>⑤ 仕様</h2>
 <div class="note">
-「プレート・取付枠の幅 1連～6連」の選択欄は廃止。<br>
-<strong>メーカー → シリーズ → 商品名・型番検索 → 使う</strong>の方式に変更。<br>
-定価は税抜。数量×定価で自動集計します。
+「部屋・場所」ごとに拾い出しを分けて管理できます。<br>
+<strong>部屋を選択 → メーカー → シリーズ → 商品名・型番検索 → 使う</strong>の方式に変更。<br>
+定価は税抜。部屋別・全体の数量×定価を自動集計します。
 </div>
 </section>
 </main>
@@ -77,11 +101,47 @@ footer{padding:10px 14px 30px;text-align:center;color:var(--muted);font-size:11p
 <script>
 const P=[["Panasonic", "コスモシリーズ ワイド21", "片切スイッチ", "WT5001", 280], ["Panasonic", "コスモシリーズ ワイド21", "3路スイッチ", "WT5002", 450], ["Panasonic", "コスモシリーズ ワイド21", "両切スイッチ", "WT5003K", 940], ["Panasonic", "コスモシリーズ ワイド21", "4路スイッチ", "WT50049", 1440], ["Panasonic", "コスモシリーズ ワイド21", "ほたる片切スイッチ", "WT50519", 610], ["Panasonic", "コスモシリーズ ワイド21", "ほたる3路スイッチ", "WT50529", 775], ["Panasonic", "コスモシリーズ ワイド21", "ほたる4路スイッチ", "WT50549", 1770], ["Panasonic", "コスモシリーズ ワイド21", "パイロットスイッチB", "WT5241", 1570], ["Panasonic", "コスモシリーズ ワイド21", "スイッチプレート 1連 ラウンド", "WTC7101W", 260], ["Panasonic", "コスモシリーズ ワイド21", "スイッチプレート 1連 スクエア", "WT8101W", 260], ["Panasonic", "コスモシリーズ ワイド21", "絶縁取付枠 スイッチ＋コンセント", "WTF37111W", 360], ["Panasonic", "コスモシリーズ ワイド21", "絶縁取付枠 スイッチ＋コンセント×2", "WTF37121W", 360], ["Panasonic", "コスモシリーズ ワイド21", "絶縁取付枠 コンセント×2＋スイッチ", "WTF371211W", 360], ["Panasonic", "コスモシリーズ ワイド21", "ダブルコンセント 金属枠", "WTF1502WK", 420], ["Panasonic", "コスモシリーズ ワイド21", "ダブルコンセント 絶縁枠", "WTF15024WK", 420], ["Panasonic", "コスモシリーズ ワイド21", "トリプルコンセント 金属枠", "WTF13033WK", 530], ["Panasonic", "コスモシリーズ ワイド21", "トリプルコンセント 絶縁枠", "WTF13034WK", 530], ["Panasonic", "コスモシリーズ ワイド21", "接地ダブルコンセント", "WTF1532WK", 810], ["Panasonic", "コスモシリーズ ワイド21", "アースターミナル付接地コンセント", "WTF11313WK", 810], ["Panasonic", "コスモシリーズ ワイド21", "アースターミナル付接地コンセント 絶縁枠", "WTF11314WK", 810], ["Panasonic", "コスモシリーズ ワイド21", "電話モジュラジャック 6極2心", "WNT15629W", 610], ["Panasonic", "コスモシリーズ ワイド21", "電話モジュラジャック 6極4心", "WNT15649W", 910], ["Panasonic", "アドバンスシリーズ", "片切スイッチ", "WTA5051", 610], ["Panasonic", "アドバンスシリーズ", "3路スイッチ", "WTA5052", 775], ["Panasonic", "アドバンスシリーズ", "4路スイッチ", "WTA5054", 1770], ["Panasonic", "アドバンスシリーズ", "スイッチ取付枠 金属枠", "WTA3700K", 155], ["Panasonic", "アドバンスシリーズ", "スイッチ絶縁取付枠", "WTA3710", 155], ["Panasonic", "アドバンスシリーズ", "ブランクチップ ダブル用 マットホワイト", "WTA30201W", 270], ["Panasonic", "アドバンスシリーズ", "ブランクチップ トリプル用 マットホワイト", "WTA3020W", 270], ["Panasonic", "アドバンスシリーズ", "石膏ボード用取付押え金具 20個", "WN3996020", 2500], ["Panasonic", "アドバンスシリーズ", "石膏ボード用取付押え金具 2連", "WN3997", 340], ["Panasonic", "アドバンスシリーズ", "石膏ボード用取付押え金具 3連", "WN3998", 660], ["Panasonic", "アドバンスシリーズ", "石膏ボード用取付押え金具 4連", "WN3999", 1020], ["Panasonic", "アドバンスシリーズ", "石膏ボード用C型はさみ金具 20個", "WN39929020", 2300], ["Panasonic", "アドバンスシリーズ", "石膏ボード用はさみ金具 20セット", "WN3993K020", 2300], ["Panasonic", "アドバンスシリーズ", "ネームスイッチカード2型", "WVC8322WK", 300], ["Panasonic", "アドバンスシリーズ", "ネームスイッチカード", "WVC8321W", 300], ["Panasonic", "アドバンスシリーズ", "ネームスイッチカード3型", "WVC8323W", 300], ["Panasonic", "アドバンスシリーズ", "アースターミナル", "WN3075CW", 390], ["Panasonic", "アドバンスシリーズ", "ブランクチップ", "WN3020CW", 85], ["Panasonic", "アドバンスシリーズ", "電話線チップ", "WN3023CW", 100], ["Panasonic", "アドバンスシリーズ", "通線チップ（ブッシング付）", "WN3025CW", 330], ["Panasonic", "アドバンスシリーズ", "絶縁セパレータ", "WV2450", 320], ["Panasonic", "アドバンスシリーズ", "専用施工枠 1連", "WTA9001", 490], ["Panasonic", "アドバンスシリーズ", "専用施工枠 2連", "WTA9002", 970], ["Panasonic", "アドバンスシリーズ", "専用施工枠 3連", "WTA9003", 1930], ["Panasonic", "アドバンスシリーズ", "新金属スイッチプレート 1連", "WTL6201", 800], ["Panasonic", "アドバンスシリーズ", "新金属スイッチプレート 2連", "WTL6202", 800], ["Panasonic", "アドバンスシリーズ", "新金属スイッチプレート 3連", "WTL6203", 800], ["Panasonic", "アドバンスシリーズ", "新金属スイッチプレート 2連用", "WTL6205", 1540], ["Panasonic", "アドバンスシリーズ", "新金属スイッチプレート 3連用", "WTL6206", 1540], ["Panasonic", "アドバンスシリーズ", "新金属スイッチプレート 7コ用", "WTL6207", 3100], ["Panasonic", "アドバンスシリーズ", "新金属スイッチプレート 8コ用", "WTL6208", 3100], ["Panasonic", "アドバンスシリーズ", "新金属スイッチプレート 9コ用", "WTL6209", 3100], ["Panasonic", "アドバンスシリーズ", "新金属コンセントプレート 1連", "WTA6201", 800], ["Panasonic", "アドバンスシリーズ", "新金属コンセントプレート 2連", "WTA6202", 1540], ["Panasonic", "アドバンスシリーズ", "新金属コンセントプレート 3連", "WTA6203", 3100], ["Panasonic", "アドバンスシリーズ", "カバープレート 1連", "WTA6291", 840], ["Panasonic", "アドバンスシリーズ", "カバープレート 2連", "WTA6292", 1650], ["Panasonic", "アドバンスシリーズ", "カバープレート 3連", "WTA6293", 3300], ["Panasonic", "アドバンスシリーズ", "露出増設ボックス", "WVA7200W", 1750], ["Panasonic", "フルカラーシリーズ", "テレホンモジュラジャック 6極2心", "WN15629W", 610], ["Panasonic", "フルカラーシリーズ", "テレホンモジュラジャック 6極4心", "WN15649W", 910], ["Panasonic", "フルカラーシリーズ", "C付テレホンモジュラジャック 6極2心", "WN4623WK", 980], ["Panasonic", "フルカラーシリーズ", "パネルカバー 1連", "WN37508", 230], ["Panasonic", "フルカラーシリーズ", "パネルカバー 2連（セパレータ付）", "WN37628", 460], ["Panasonic", "フルカラーシリーズ", "石膏ボード用取付押え金具 20個", "WN3996020", 2500]];
 let selected="すべて";
-let cart=JSON.parse(localStorage.getItem("jstyle_cart_v6")||"[]");
+let rooms=JSON.parse(localStorage.getItem("jstyle_rooms_v7")||"[]");
+let activeRoomId=localStorage.getItem("jstyle_active_room_v7")||"";
+let cart=JSON.parse(localStorage.getItem("jstyle_cart_v7")||"[]");
+if(!rooms.length){rooms=[{id:"r1",name:"共通・未分類"}];activeRoomId="r1";}
+if(!activeRoomId||!rooms.some(r=>r.id===activeRoomId))activeRoomId=rooms[0].id;
 const series=["すべて","コスモシリーズ ワイド21","アドバンスシリーズ","フルカラーシリーズ"];
 function yen(n){return "¥"+Number(n).toLocaleString("ja-JP")}
-function save(){localStorage.setItem("jstyle_cart_v6",JSON.stringify(cart))}
+function save(){localStorage.setItem("jstyle_cart_v7",JSON.stringify(cart))}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+
+function saveRooms(){localStorage.setItem("jstyle_rooms_v7",JSON.stringify(rooms));localStorage.setItem("jstyle_active_room_v7",activeRoomId)}
+function save(){localStorage.setItem("jstyle_cart_v7",JSON.stringify(cart))}
+function currentRoom(){return rooms.find(r=>r.id===activeRoomId)||rooms[0]}
+function renderRooms(){
+ const sel=document.getElementById("roomSelect");
+ sel.innerHTML=rooms.map(r=>`<option value="${esc(r.id)}" ${r.id===activeRoomId?"selected":""}>${esc(r.name)}</option>`).join("");
+ document.getElementById("roomList").innerHTML=rooms.map(r=>{
+   const q=cart.filter(x=>x.roomId===r.id).reduce((a,x)=>a+x.qty,0);
+   return `<div class="room-card ${r.id===activeRoomId?"active":""}" onclick="setRoom('${esc(r.id)}')">
+     <b>${esc(r.name)}</b><div class="room-meta">${q}個・タップで選択</div>
+   </div>`;
+ }).join("");
+}
+function setRoom(id){if(!rooms.some(r=>r.id===id))return;activeRoomId=id;saveRooms();renderRooms();renderCart()}
+function selectRoomFromDropdown(){setRoom(document.getElementById("roomSelect").value)}
+function addRoom(){
+ const name=document.getElementById("roomName").value.trim();
+ if(!name){alert("部屋名を入力してください。");return}
+ const id="r"+Date.now();
+ rooms.push({id,name});activeRoomId=id;document.getElementById("roomName").value="";
+ saveRooms();renderRooms();renderCart();
+}
+function deleteRoom(id){
+ if(rooms.length<=1){alert("最後の1部屋は削除できません。");return}
+ const room=rooms.find(r=>r.id===id);if(!room)return;
+ if(cart.some(x=>x.roomId===id)&&!confirm(`「${room.name}」の拾い出しも削除しますか？`))return;
+ cart=cart.filter(x=>x.roomId!==id);rooms=rooms.filter(r=>r.id!==id);
+ if(activeRoomId===id)activeRoomId=rooms[0].id;
+ saveRooms();save();renderRooms();renderCart();
+}
+
 function renderTabs(){
  const el=document.getElementById("seriesTabs");
  el.innerHTML=series.map(s=>`<button class="tab ${selected===s?"active":""}" onclick="selected='${s}';render()">${s}</button>`).join("");
@@ -102,46 +162,32 @@ function render(){
 }
 function addByCode(code){const p=P.find(x=>x[3]===code);if(p)add(p)}
 function add(p){
- const hit=cart.find(x=>x.code===p[3]);
- if(hit) hit.qty++; else cart.push({maker:p[0],series:p[1],name:p[2],code:p[3],price:p[4],qty:1});
- save();renderCart();
+ if(!currentRoom()){alert("先に部屋を選択してください。");return}
+ const hit=cart.find(x=>x.roomId===activeRoomId&&x.code===p[3]);
+ if(hit) hit.qty++; else cart.push({roomId:activeRoomId,maker:p[0],series:p[1],name:p[2],code:p[3],price:p[4],qty:1});
+ save();renderRooms();renderCart();
 }
-function change(code,delta){
- const x=cart.find(x=>x.code===code);if(!x)return;
- x.qty=Math.max(1,x.qty+delta);save();renderCart();
+function change(code,delta,roomId){
+ const x=cart.find(x=>x.code===code&&x.roomId===roomId);if(!x)return;
+ x.qty=Math.max(1,x.qty+delta);save();renderRooms();renderCart();
 }
-function setQty(code,v){
- const x=cart.find(x=>x.code===code);if(!x)return;
- x.qty=Math.max(1,parseInt(v||1,10));save();renderCart();
+function setQty(code,v,roomId){
+ const x=cart.find(x=>x.code===code&&x.roomId===roomId);if(!x)return;
+ x.qty=Math.max(1,parseInt(v||1,10));save();renderRooms();renderCart();
 }
-function removeItem(code){cart=cart.filter(x=>x.code!==code);save();renderCart()}
-function renderCart(){
- const result=document.getElementById("results");
- result.innerHTML=cart.map(x=>`
- <div class="result-row">
-   <div><b>${esc(x.name)}</b><div class="small">${esc(x.code)} / ${yen(x.price)}・税抜</div></div>
-   <div style="text-align:center">${x.qty}</div>
-   <div style="text-align:right">${yen(x.price*x.qty)}</div>
- </div>
- <div class="qty">
-   <button onclick="change('${esc(x.code)}',-1)">−</button>
-   <input value="${x.qty}" onchange="setQty('${esc(x.code)}',this.value)" type="number" min="1">
-   <button onclick="change('${esc(x.code)}',1)">＋</button>
-   <button class="danger" style="margin-left:auto" onclick="removeItem('${esc(x.code)}')">削除</button>
- </div>`).join("") || '<div class="small">まだ商品がありません。</div>';
- const total=cart.reduce((a,x)=>a+x.price*x.qty,0);
- document.getElementById("count").textContent=cart.length;
- document.getElementById("qty").textContent=cart.reduce((a,x)=>a+x.qty,0);
- document.getElementById("total").textContent=yen(total);
-}
-function clearAll(){if(confirm("拾い出し結果を全部消しますか？")){cart=[];save();renderCart()}}
+function removeItem(code,roomId){cart=cart.filter(x=>!(x.code===code&&x.roomId===roomId));save();renderRooms();renderCart()}
+function clearAll(){if(confirm("全部屋の拾い出し結果を消しますか？")){cart=[];save();renderRooms();renderCart()}}
 function copyCSV(){
- const rows=[["メーカー","シリーズ","商品名","型番","数量","定価","金額"]];
- cart.forEach(x=>rows.push([x.maker,x.series,x.name,x.code,x.qty,x.price,x.price*x.qty]));
- navigator.clipboard.writeText(rows.map(r=>r.join(",")).join("\n"));
- alert("CSV形式でコピーしました。");
+ const rows=[["部屋","メーカー","シリーズ","商品名","型番","数量","定価","金額"]];
+ cart.forEach(x=>{
+   const room=rooms.find(r=>r.id===x.roomId);
+   rows.push([room?room.name:"共通・未分類",x.maker,x.series,x.name,x.code,x.qty,x.price,x.price*x.qty]);
+ });
+ navigator.clipboard.writeText(rows.map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n"));
+ alert("部屋別CSV形式でコピーしました。");
 }
 document.getElementById("search").addEventListener("input",render);
+renderRooms();
 render();
 </script>
 </body>
